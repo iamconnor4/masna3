@@ -1,0 +1,64 @@
+module Masna3.Server.Environment where
+
+import Auth.Biscuit (PublicKey)
+import Data.ByteString (StrictByteString)
+import Data.Pool (Pool)
+import Data.Pool qualified as Pool
+import Data.Text (Text)
+import Data.Time
+import Data.Word
+import Database.PostgreSQL.Simple qualified as PG
+import Effectful
+import Env qualified
+import GHC.Generics (Generic)
+
+import Masna3.Server.Config
+
+data Masna3Env = Masna3Env
+  { pool :: Pool PG.Connection
+  , dbConfig :: PoolConfig
+  , jobsPool :: Pool PG.Connection
+  , httpPort :: Word16
+  , domain :: Text
+  , mltp :: MLTP
+  , deployed :: Bool
+  , publicKey :: PublicKey
+  }
+  deriving stock (Generic)
+
+mkPool
+  :: IOE :> es
+  => StrictByteString -- Database access information
+  -> NominalDiffTime -- Allowed timeout
+  -> Int -- Number of connections
+  -> Eff es (Pool PG.Connection)
+mkPool connectionInfo timeout' connections =
+  liftIO $
+    Pool.newPool $
+      Pool.defaultPoolConfig
+        (PG.connectPostgreSQL connectionInfo)
+        PG.close
+        (realToFrac timeout')
+        connections
+
+configToEnv :: IOE :> es => Masna3Config -> Eff es Masna3Env
+configToEnv masna3Config = do
+  let PoolConfig{connectionTimeout, connections} = masna3Config.dbConfig
+  pool <- mkPool masna3Config.connectionInfo connectionTimeout connections
+  jobsPool <- mkPool masna3Config.connectionInfo connectionTimeout connections
+  pure
+    Masna3Env
+      { pool = pool
+      , dbConfig = masna3Config.dbConfig
+      , jobsPool = jobsPool
+      , httpPort = masna3Config.httpPort
+      , domain = masna3Config.domain
+      , mltp = masna3Config.mltp
+      , deployed = masna3Config.deployed
+      , publicKey = masna3Config.publicKey
+      }
+
+getMasna3Env :: IOE :> es => Eff es Masna3Env
+getMasna3Env = do
+  config <- liftIO $ Env.parse id parseConfig
+  configToEnv config

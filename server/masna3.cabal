@@ -3,7 +3,7 @@ name: masna3
 version: 0.1.0.0
 synopsis: File Storage Proxy
 license: LGPL-3.0-only
-license-file: LICENSE
+license-file: ../LICENSE
 author: Théophile Choutri de Tarlé
 maintainer: The Masna3 Contributors
 build-type: Simple
@@ -13,13 +13,13 @@ source-repository head
   type: git
   location: https://github.com/tchoutri/masna3
 
-common common-extensions
+common extensions
   default-extensions:
+    DeepSubsumption
     DeriveAnyClass
     DerivingVia
     DuplicateRecordFields
     NoStarIsType
-    DeepSubsumption
     OverloadedLabels
     OverloadedRecordDot
     OverloadedStrings
@@ -34,7 +34,7 @@ common common-extensions
 
   default-language: GHC2024
 
-common common-ghc-options
+common ghc-options
   ghc-options:
     -Wall
     -Wcompat
@@ -47,13 +47,26 @@ common common-ghc-options
     -Wno-unused-do-bind
     -funbox-strict-fields
     -Wunused-packages
+    -Wno-unticked-promoted-constructors
     -funbox-small-strict-fields
 
+common rts-options
+  ghc-options:
+    -rtsopts
+    -threaded
+    "-with-rtsopts=-N -T"
+
 library
-  import: common-extensions
-  import: common-ghc-options
+  import: extensions
+  import: ghc-options
   -- cabal-gild: discover src
-  exposed-modules: Masna3.Server
+  exposed-modules:
+    Masna3.Config
+    Masna3.Server
+    Masna3.Server.Config
+    Masna3.Server.Environment
+    Masna3.Server.File
+
   build-depends:
     base >=4.20 && <4.21,
     biscuit-haskell,
@@ -61,11 +74,36 @@ library
     bytestring,
     effectful,
     effectful-core,
+    envparse,
     heptapod,
+    log-base,
+    log-effectful,
+    masna3-api,
+    monad-time-effectful,
+    network,
+    postgresql-simple,
     resource-pool,
     servant,
     servant-server,
+    text,
+    text-display,
+    time,
     uuid-types,
+    wai,
+    wai-log,
+    warp,
 
   hs-source-dirs: src
   default-language: GHC2024
+
+executable masna3-server
+  import: extensions
+  import: ghc-options
+  import: rts-options
+  main-is: Main.hs
+  hs-source-dirs: app
+  build-depends:
+    base,
+    effectful,
+    log-base,
+    masna3,

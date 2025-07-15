@@ -1,8 +1,39 @@
 module Masna3.Api.File where
 
+import Data.Aeson
+import Data.Text
+import Data.UUID.Types
+import GHC.Generics
 import Servant.API
 
-import Masna3.Api.Types.File
+import Masna3.Api.File.Types
+
+data FileRegistrationForm = FileRegistrationForm
+  { fileName :: Text
+  , owner :: Text
+  , mimetype :: Text
+  }
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving anyclass (FromJSON, ToJSON)
+
+data FileRegistrationResult = FileRegistrationResult
+  { fileId :: UUID
+  , url :: Text
+  }
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving anyclass (FromJSON, ToJSON)
+
+data UploadConfirmationForm = UploadConfirmationForm
+  { fileId :: UUID
+  }
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving anyclass (FromJSON, ToJSON)
+
+data UploadCancellationForm = UploadCancellationForm
+  { fileId :: UUID
+  }
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving anyclass (FromJSON, ToJSON)
 
 type RegisterFile =
   Summary "Register a file for upload"
@@ -12,12 +43,19 @@ type RegisterFile =
 
 type ConfirmFileUpload =
   Summary "Register a file for upload"
-    :> Capture "file_id"
+    :> Capture "file_id" FileId
     :> ReqBody '[JSON] UploadConfirmationForm
-    :> Post '[JSON] ()
+    :> Post '[JSON] NoContent
 
 type CancelFileUpload =
   Summary "Cancel a file upload"
-    :> Capture "file_id"
+    :> Capture "file_id" FileId
     :> ReqBody '[JSON] UploadCancellationForm
-    :> Post '[JSON] ()
+    :> Post '[JSON] NoContent
+
+data FileRoutes mode = FileRoutes
+  { register :: mode :- RegisterFile
+  , confirm :: mode :- ConfirmFileUpload
+  , cancel :: mode :- CancelFileUpload
+  }
+  deriving stock (Generic)

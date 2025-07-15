@@ -53,8 +53,9 @@ library
   import: common-ghc-options
   -- cabal-gild: discover src
   exposed-modules:
+    Masna3.Api
     Masna3.Api.File
-    Masna3.Api.Types.File
+    Masna3.Api.File.Types
 
   build-depends:
     aeson,
