@@ -1,0 +1,88 @@
+name: Backend
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: backend-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  generateMatrix:
+    name: "Generate matrix from cabal"
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Extract the tested GHC versions
+        id: set-matrix
+        uses: kleidukos/get-tested@v0.1.7.1
+        with:
+          cabal-file: server/masna3.cabal
+          ubuntu-version: "22.04"
+          version: 0.1.7.1
+
+  Backend_tests:
+    needs: generateMatrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix: ${{ fromJSON(needs.generateMatrix.outputs.matrix) }}
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Haskell
+      id: setup-haskell
+      uses: haskell-actions/setup@v2
+      with:
+        ghc-version: "${{ matrix.ghc }}"
+        cabal-version: "latest"
+
+    - name: Configure environment
+      run: |
+        ./.github/workflows/setup.sh
+        echo "/usr/lib/postgresql/14/bin/" >> $GITHUB_PATH
+        echo "$HOME/.ghcup/bin" >> $GITHUB_PATH
+        echo "$HOME/.cabal/bin" >> $GITHUB_PATH
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        echo "$HOME/node_modules/.bin" >> $GITHUB_PATH
+        sudo apt install libsodium-dev
+        source ./environment.ci.sh
+        touch ~/.pgpass
+        chmod 0600 ~/.pgpass
+        echo "${MASNA3_DB_HOST}:${MASNA3_DB_PORT}:${MASNA3_DB_DATABASE}:${MASNA3_DB_USER}:${MASNA3_DB_PASSWORD}" > .pgpass
+        cat ~/.pgpass
+        cabal update
+
+    - name: "Create freeze file"
+      run: |
+        cabal freeze --enable-tests
+
+    - name: Cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.setup-haskell.outputs.cabal-store }}
+        key: ${{ runner.os }}-ghc-${{ matrix.ghc }}-cabal-${{ hashFiles('./dist-newstyle/cache/plan.json') }}
+        restore-keys: ${{ runner.os }}-ghc-${{ matrix.ghc }}-
+
+    - name: Build
+      run: |
+        make build
