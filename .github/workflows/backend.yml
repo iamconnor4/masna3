@@ -58,8 +58,6 @@ jobs:
 
     - name: Configure environment
       run: |
-        ./.github/workflows/setup.sh
-        echo "/usr/lib/postgresql/14/bin/" >> $GITHUB_PATH
         echo "$HOME/.ghcup/bin" >> $GITHUB_PATH
         echo "$HOME/.cabal/bin" >> $GITHUB_PATH
         echo "$HOME/.local/bin" >> $GITHUB_PATH
