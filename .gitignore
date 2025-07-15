@@ -8,3 +8,4 @@ Session.vim
 hie.yaml
 tags
 tags.mtime
+*.local.sh

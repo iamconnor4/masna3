@@ -17,6 +17,13 @@ style: ## Run the code stylers
 	@fourmolu -q --mode inplace server api
 	@find server api -name "*.hs" | xargs -P $(PROCS) -I {} hlint --refactor-options="-i" --refactor {}
 
+style-quick: ## Run the code stylers are changed files
+	@cd server ; cabal-gild --mode=format --io=masna3.cabal
+	@cd api ; cabal-gild --mode=format --io=masna3-api.cabal
+	@cabal-gild --mode=format --io=cabal.project
+	@git diff origin --name-only api server | xargs -P $(PROCS) -I {} fourmolu -q -i {}
+	@git diff origin --name-only api server | xargs -P $(PROCS) -I {} hlint --refactor-options="-i" --refactor {}
+
 tags: ## Generate ctags for the project with `ghc-tags`
 	@ghc-tags -c api server
 

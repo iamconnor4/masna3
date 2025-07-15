@@ -7,7 +7,7 @@ files. These URLs refer to particular object, serve one specific purpose (upload
 
 ## 🍅 Build
 
-You need GHC 9.10.1 and `cabal-install` >= 3.14.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the requirements.
 
 run `make build` to build the whole project, API and server.
 
