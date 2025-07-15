@@ -1,4 +1,4 @@
-# Masna3 (مصنع) [![Made with Haskell](https://img.shields.io/badge/Made%20in-Haskell-%235e5086?logo=haskell&style=flat-square)](https://haskell.org)
+# 🏭 Masna3 (مصنع) [![Made with Haskell](https://img.shields.io/badge/Made%20in-Haskell-%235e5086?logo=haskell&style=flat-square)](https://haskell.org)
 
 Masna3 (the 3 is for the letter ع) is a file store service. It acts as a synchronisation point between user-facing clients and object storage services.
 
