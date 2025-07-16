@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant S as Storage
+    participant C as Client
+    participant M as Masna3
+
+    C ->>M: I want to upload a file
+    M ->>C: Here is a pre-signed URL
+    alt File can be uploaded
+        C ->>S: Upload the file
+        C ->>M: Confirm the upload
+    else A problem happened
+        C ->>M: Cancel the Upload
+    end
