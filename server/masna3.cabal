@@ -7,7 +7,7 @@ license-file: ../LICENSE
 author: Théophile Choutri de Tarlé
 maintainer: The Masna3 Contributors
 build-type: Simple
-extra-doc-files: CHANGELOG.md
+extra-doc-files: ../CHANGELOG.md
 tested-with: ghc ==9.10.1
 
 source-repository head
@@ -50,6 +50,7 @@ common ghc-options
     -Wunused-packages
     -Wno-unticked-promoted-constructors
     -funbox-small-strict-fields
+    -Winvalid-haddock
 
 common rts-options
   ghc-options:
