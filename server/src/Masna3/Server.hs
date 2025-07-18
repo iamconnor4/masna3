@@ -34,7 +34,7 @@ runMasna3
   -> Masna3Env
   -> Eff es ()
 runMasna3 logger environment = do
-  loggingMiddleware <- Log.runLog "flora-server" logger Log.defaultLogLevel WaiLog.mkLogMiddleware
+  loggingMiddleware <- Log.runLog "masna3-server" logger Log.defaultLogLevel WaiLog.mkLogMiddleware
   let server = makeServer logger environment
   let warpSettings =
         setPort (fromIntegral environment.httpPort) defaultSettings

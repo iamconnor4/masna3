@@ -15,7 +15,7 @@ The following Haskell command-line tools will have to be installed:
 * `cabal-gild`: To style the cabal files
 * `ghc-tags`: To generate tags for the project
 
-Outside of the flora root directory run:
+Outside of the masna3 root directory run:
 ```
 cabal install --ghc-options="-j" -j postgresql-migration hlint cabal-gild ghc-tags
 ```
@@ -27,7 +27,7 @@ cabal install --ghc-options="-j" -j postgresql-migration hlint cabal-gild ghc-ta
 The project uses a `Makefile` to run usual build/clean/style rules.
 Please type `make help` to see these rules.
 
-[CoC]: https://github.com/flora-pm/flora-server/blob/development/CODE_OF_CONDUCT.md
+[CoC]: https://github.com/tchoutri/masna3/blob/main/CODE_OF_CONDUCT.md
 
 ## Configuration
 
