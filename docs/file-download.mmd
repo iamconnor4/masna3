@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant S as Storage
+    participant C as Client
+    participant M as Masna3
+    C ->> M: Give me the Link for this file
+    M ->> C: Here's the Pre-signed URL
+    C ->> S: GET the URL
+    alt 
+    S ->> C: URL is valid, here's the file
+    else TTL has expired
+    S ->> C: Invalid URL
+    end
