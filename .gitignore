@@ -9,3 +9,4 @@ hie.yaml
 tags
 tags.mtime
 *.local.sh
+pgdata/

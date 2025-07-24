@@ -1,42 +1,26 @@
 services:
   server:
-    image: ghcr.io/flora-pm/flora-server:latest
-    ports:
-      - "8084:8084"
-    volumes:
-      - database-data:/flora-server/pgdata/
-      - .:/flora-server:Z
-    links:
-      - database
-    command: sleep infinity
-    profiles:
-      - local
-    depends_on:
-      - database
-
-  dev-server:
-    ports:
-      - "8084:8084"
+    image: masna3-server-devel
     build:
       dockerfile: Dockerfile
       args:
         - USER=${USER}
         - UID=${UID:-1000}
         - GID=${GID:-1000}
+    ports:
+      - "8085:8085"
     volumes:
-      - database-data:/flora-server/pgdata/
-      - .:/flora-server:Z
-    links:
-      - database
+      - database-data:/masna3/pgdata/
+      - .:/masna3:Z
     command: sleep infinity
     profiles:
-      - dev
+      - local
     depends_on:
       - database
+    init: true
 
   database:
-    # Pinned postgres:14.7
-    image: "postgres@sha256:577d48a963bdd16e8b93e853aa830c78fc4622ebe9717bc95f6736d9aa5003e3"
+    image: "postgres:17.5"
     container_name: database
     user: postgres
     healthcheck:
@@ -54,7 +38,6 @@ services:
       - database-data:/var/lib/postgresql/data
     profiles:
       - local
-      - dev
 
 volumes:
   database-data:
