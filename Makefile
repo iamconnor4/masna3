@@ -1,3 +1,6 @@
+init: ## Initialise the project for local development
+	@./scripts/init.sh
+
 build: ## Build the project
 	@cabal build all
 

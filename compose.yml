@@ -1,17 +1,20 @@
 services:
-  server:
-    image: masna3-server-devel
+  devel:
+    user: "${UID}:${GID}"
+    image: $USER-masna3-devel
     build:
       dockerfile: Dockerfile
+      target: devel
       args:
         - USER=${USER}
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
+        - UID=${UID}
+        - GID=${GID}
     ports:
       - "8085:8085"
     volumes:
       - database-data:/masna3/pgdata/
-      - .:/masna3:Z
+      - $SOURCE_DIRECTORY:/home/$USER/masna3
+
     command: sleep infinity
     profiles:
       - local
@@ -20,7 +23,7 @@ services:
     init: true
 
   database:
-    image: "postgres:17.5"
+    image: docker.io/library/postgres:17.5
     container_name: database
     user: postgres
     healthcheck:
