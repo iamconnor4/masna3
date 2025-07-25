@@ -1,6 +1,6 @@
 services:
   devel:
-    user: "${UID}:${GID}"
+    user: ${UID}:${GID}
     image: $USER-masna3-devel
     build:
       dockerfile: Dockerfile
@@ -12,14 +12,14 @@ services:
     ports:
       - "8085:8085"
     volumes:
-      - database-data:/masna3/pgdata/
-      - $SOURCE_DIRECTORY:/home/$USER/masna3
-
+      - $SOURCE_DIRECTORY:/home/$USER/masna3:Z
+      - database-data:/home/$USER/masna3/pgdata
     command: sleep infinity
     profiles:
       - local
     depends_on:
       - database
+    working_dir: /home/$USER/masna3
     init: true
 
   database:

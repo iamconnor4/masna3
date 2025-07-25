@@ -92,17 +92,12 @@ RUN apt install -y libpq-dev wget tmux postgresql-client
 RUN groupadd -g "$GID" -o "$USER" \
   && useradd -r -u "$UID" -g "$GID" -m -s /bin/bash "$USER"
 
-RUN mkdir /masna3
-RUN chown -R local:local /masna3
-
 RUN mkdir /home/$USER/.cabal
-RUN chown -R local:local /home/local/.cabal
+RUN chown -R $UID:$GID /home/$USER
 
-USER local
-
-WORKDIR /masna3
+USER $USER
 
 RUN git config --global --add safe.directory "*"
-RUN chown -R local:local .
+RUN chown -R $UID:$GID /home/$USER
 RUN echo 'export PATH="$PATH:/home/$USER/.cabal/bin"' >> ~/.bashrc
 RUN echo "source /opt/ghcup/.ghcup/env" >> ~/.bashrc
