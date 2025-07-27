@@ -27,6 +27,10 @@ cabal install --ghc-options="-j" -j postgresql-migration hlint cabal-gild ghc-ta
 The project uses a `Makefile` to run usual build/clean/style rules.
 Please type `make help` to see these rules.
 
+## Docker setup
+
+For ease of developer, a Docker Compose setup is provided. See the build rules starting with `docker-` to build, start and enter the container.
+
 [CoC]: https://github.com/tchoutri/masna3/blob/main/CODE_OF_CONDUCT.md
 
 ## Configuration

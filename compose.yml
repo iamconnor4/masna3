@@ -1,0 +1,46 @@
+services:
+  devel:
+    user: ${UID}:${GID}
+    image: $USER-masna3-devel
+    build:
+      dockerfile: Dockerfile
+      target: devel
+      args:
+        - USER=${USER}
+        - UID=${UID}
+        - GID=${GID}
+    ports:
+      - "8085:8085"
+    volumes:
+      - $SOURCE_DIRECTORY:/home/$USER/masna3:Z,U
+      - database-data:/home/$USER/masna3/pgdata
+    command: sleep infinity
+    profiles:
+      - local
+    depends_on:
+      - database
+    working_dir: /home/$USER/masna3
+    init: true
+
+  database:
+    image: docker.io/library/postgres:17.5
+    container_name: database
+    user: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    env_file:
+      - database.env
+    volumes:
+      - database-data:/var/lib/postgresql/data
+    profiles:
+      - local
+
+volumes:
+  database-data:

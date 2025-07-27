@@ -24,3 +24,5 @@ export MASNA3_ZIPKIN_ENABLED=""
 export MASNA3_ZIPKIN_AGENT_HOST=""
 # The port of the Zipkin collection agent
 export MASNA3_ZIPKIN_AGENT_PORT=""
+
+export DOCKER_BUILDKIT=1
