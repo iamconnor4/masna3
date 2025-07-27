@@ -12,7 +12,7 @@ services:
     ports:
       - "8085:8085"
     volumes:
-      - $SOURCE_DIRECTORY:/home/$USER/masna3:Z
+      - $SOURCE_DIRECTORY:/home/$USER/masna3:Z,U
       - database-data:/home/$USER/masna3/pgdata
     command: sleep infinity
     profiles:

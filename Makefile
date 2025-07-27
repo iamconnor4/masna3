@@ -30,6 +30,21 @@ style-quick: ## Run the code stylers are changed files
 tags: ## Generate ctags for the project with `ghc-tags`
 	@ghc-tags -c api server
 
+docker-build: ## Build and start the container cluster
+	@docker build .
+
+docker-up: ## Start the container cluster
+	@docker compose up -d
+
+docker-stop: ## Stop the container cluster without removing the containers
+	@docker compose stop
+
+docker-down: ## Stop and remove the container cluster
+	@docker compose down
+
+docker-enter: ## Enter the docker environment
+	docker compose exec devel bash
+
 help: ## Display this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.* ?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 

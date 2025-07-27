@@ -73,6 +73,8 @@ RUN cabal install --install-method=copy --installdir=out/ --semaphore -j ghc-tag
 
 # This stage is the development environment
 FROM base AS devel
+USER root
+
 ARG GID
 ARG UID
 ARG USER
@@ -90,14 +92,16 @@ RUN apt update
 RUN apt install -y libpq-dev wget tmux postgresql-client
 
 RUN groupadd -g "$GID" -o "$USER" \
-  && useradd -r -u "$UID" -g "$GID" -m -s /bin/bash "$USER"
+  && useradd -l -r -u "$UID" -g "$GID" -m -s /bin/bash "$USER"
 
 RUN mkdir /home/$USER/.cabal
 RUN chown -R $UID:$GID /home/$USER
 
 USER $USER
 
-RUN git config --global --add safe.directory "*"
 RUN chown -R $UID:$GID /home/$USER
+RUN mkdir -p /home/$USER/masna3 \
+  && chown -R $UID:$GID /home/$USER/masna3
+
 RUN echo 'export PATH="$PATH:/home/$USER/.cabal/bin"' >> ~/.bashrc
 RUN echo "source /opt/ghcup/.ghcup/env" >> ~/.bashrc
