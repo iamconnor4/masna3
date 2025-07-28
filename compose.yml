@@ -42,5 +42,17 @@ services:
     profiles:
       - local
 
+  s3mock:
+    image: adobe/s3mock:4.7.0
+    environment:
+      - COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT=true
+      - COM_ADOBE_TESTING_S3MOCK_STORE_ROOT=containers3root
+      - COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS=masna3-dev
+    ports:
+      - 9090:9090
+    volumes:
+      - s3mock-data:/containers3root
+
 volumes:
   database-data:
+  s3mock-data:
