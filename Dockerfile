@@ -89,7 +89,7 @@ RUN ghcup install ghc $GHC_VERSION
 RUN ghcup set ghc $GHC_VERSION
 
 RUN apt update
-RUN apt install -y libpq-dev wget tmux postgresql-client
+RUN apt install -y libpq-dev wget tmux postgresql-client direnv
 
 RUN groupadd -g "$GID" -o "$USER" \
   && useradd -l -r -u "$UID" -g "$GID" -m -s /bin/bash "$USER"
@@ -105,3 +105,5 @@ RUN mkdir -p /home/$USER/masna3 \
 
 RUN echo 'export PATH="$PATH:/home/$USER/.cabal/bin"' >> ~/.bashrc
 RUN echo "source /opt/ghcup/.ghcup/env" >> ~/.bashrc
+RUN echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
+RUN direnv allow
