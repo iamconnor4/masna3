@@ -1,4 +1,4 @@
-CREATE TYPE archival_reason AS ENUM ('deleted', 'cancelled');
+CREATE TYPE archival_reason AS ENUM ('deleted' , 'cancelled');
 
 CREATE TABLE archived_files (
     archived_file_id uuid PRIMARY KEY

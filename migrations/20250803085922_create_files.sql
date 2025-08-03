@@ -1,8 +1,8 @@
-CREATE TYPE file_status AS ENUM ('pending', 'uploaded');
+CREATE TYPE file_status AS ENUM ('pending' , 'uploaded');
 
 CREATE TABLE files (
     file_id uuid PRIMARY KEY
-  , owner_id uuid REFERENCES owners (owner_id) NOT NULL 
+  , owner_id uuid REFERENCES owners (owner_id) NOT NULL
   , filename text NOT NULL
   , path text NOT NULL
   , status file_status NOT NULL
@@ -12,10 +12,10 @@ CREATE TABLE files (
   , updated_at timestamptz
   , uploaded_at timestamptz
   , CONSTRAINT unique_path_by_bucket UNIQUE (bucket, path)
-  , CONSTRAINT uploaded_at_status CHECK (
-       ( status = 'pending' AND uploaded_at IS NULL)
-    OR ( status = 'uploaded' AND uploaded_at IS NOT NULL)
-  )
+  , CONSTRAINT uploaded_at_status
+        CHECK (
+            (status = 'pending' AND uploaded_at IS NULL)
+         OR (status = 'uploaded' AND uploaded_at IS NOT NULL))
 );
 
 CREATE INDEX files_owner_id_fkey ON files (owner_id);
