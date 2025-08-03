@@ -45,6 +45,16 @@ docker-down: ## Stop and remove the container cluster
 docker-enter: ## Enter the docker environment
 	docker compose exec devel bash
 
+migration: ## Generate timestamped database migration boilerplate files
+	@if test -z "$$name"; then \
+	  echo "Usage: make migration name=some-name"; \
+	else \
+	  migName="`date -u '+%Y%m%d%H%M%S'`_$$name"; \
+	  fname="migrations/$$migName.sql"; \
+	  touch "$$fname"; \
+	  echo "Created $$fname";\
+	fi
+
 help: ## Display this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.* ?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
