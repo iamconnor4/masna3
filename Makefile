@@ -55,6 +55,22 @@ migration: ## Generate timestamped database migration boilerplate files
 	  echo "Created $$fname";\
 	fi
 
+db-setup: db-create db-init db-migrate ## Setup the dev database
+
+db-create: ## Create the database
+    @createdb -h $(MASNA3_DB_HOST) -p $(MASNA3_DB_PORT) -U $(MASNA3_DB_USER) $(MASNA3_DB_DATABASE)
+
+db-drop: ## Drop the database
+    @dropdb -f --if-exists -h $(MASNA3_DB_HOST) -p $(MASNA3_DB_PORT) -U $(MASNA3_DB_USER) $(MASNA3_DB_DATABASE)
+
+db-init: ## Create the database schema
+    @migrate init "$(MASNA3_DB_CONNSTRING)"
+
+db-migrate: ## Apply database migrations
+    @migrate migrate "$(MASNA3_DB_CONNSTRING)" migrations
+
+db-reset: db-drop db-setup db-provision ## Reset the dev database
+
 help: ## Display this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.* ?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
