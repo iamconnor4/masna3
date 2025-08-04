@@ -1,9 +1,7 @@
-{-# LANGUAGE QuasiQuotes #-}
-
 module Masna3.Server.Model.Owner.Update where
 
 import Control.Monad (void)
-import Database.PostgreSQL.Simple.SqlQQ
+import Database.PostgreSQL.Entity
 import Effectful
 import Effectful.PostgreSQL
 
@@ -14,14 +12,4 @@ insertOwner
      , WithConnection :> es
      )
   => Owner -> Eff es ()
-insertOwner Owner{..} = void $ execute q (ownerId, ownerName, createdAt, updatedAt)
-  where
-    q =
-      [sql|
-           INSERT INTO owners VALUES (
-              ?
-            , ?
-            , ?
-            , ?
-            )
-        |]
+insertOwner owner = void $ execute (_insert @Owner) owner

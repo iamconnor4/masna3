@@ -1,9 +1,11 @@
+{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE QuasiQuotes #-}
 
 module Masna3.Server.Model.Owner.Query where
 
 import Data.Text (Text)
-import Database.PostgreSQL.Simple.SqlQQ
+import Database.PostgreSQL.Entity
+import Database.PostgreSQL.Entity.Internal.QQ
 import Database.PostgreSQL.Simple.Types
 import Effectful
 import Effectful.Error.Static (Error)
@@ -20,18 +22,8 @@ getOwnerByName
      )
   => Text -> Eff es (Maybe Owner)
 getOwnerByName ownerName = do
-  result <- query q (Only ownerName)
+  result <- query (_select @Owner <> _where [[field| owner_name |]]) (Only ownerName)
   case result of
     [] -> pure Nothing
     [r] -> pure (Just r)
     _ -> Error.throwError (TooManyRows ownerName)
-  where
-    q =
-      [sql|
-    SELECT o1.owner_id
-         , o1.owner_name
-         , o1.created_at
-         , o1.updated_at
-    FROM owners as o1
-    WHERE o1.owner_name = ?
-    |]

@@ -13,11 +13,12 @@ package *
   gcc-options: -march=native
 
 allow-newer:
-  amazonka:*,
   amazonka-s3:*,
-  postgresql-simple-named:*,
+  amazonka:*,
   effectful-postgresql:*,
-  unliftio-pool:*
+  pg-entity:*,
+  postgresql-simple-named:*,
+  unliftio-pool:*,
 
 source-repository-package
   type: git

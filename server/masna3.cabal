@@ -91,6 +91,7 @@ library
     masna3-api,
     monad-time-effectful,
     network,
+    pg-entity,
     postgresql-simple,
     resource-pool,
     servant,
@@ -104,7 +105,6 @@ library
     warp,
 
   hs-source-dirs: src
-  default-language: GHC2024
 
 executable masna3-server
   import: extensions
@@ -117,3 +117,30 @@ executable masna3-server
     effectful,
     log-base,
     masna3,
+
+test-suite masna3-test
+  import: extensions
+  import: ghc-options
+  import: rts-options
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  hs-source-dirs: test
+  -- cabal-gild: discover test --exclude "test/Main.hs"
+  other-modules:
+    Masna3.Test.Utils
+
+  build-depends:
+    aeson,
+    base,
+    effectful-core,
+    effectful-postgresql,
+    log-base,
+    log-effectful,
+    masna3,
+    masna3-api,
+    monad-time-effectful,
+    postgresql-migration,
+    postgresql-simple,
+    tasty,
+    tasty-hunit,
+    time,

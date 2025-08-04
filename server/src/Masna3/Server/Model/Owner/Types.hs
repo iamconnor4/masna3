@@ -2,6 +2,8 @@ module Masna3.Server.Model.Owner.Types where
 
 import Data.Text (Text)
 import Data.Time (UTCTime)
+import Database.PostgreSQL.Entity
+import Database.PostgreSQL.Entity.Types
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToRow
 import Effectful
@@ -18,6 +20,9 @@ data Owner = Owner
   }
   deriving stock (Eq, Generic, Ord, Show)
   deriving anyclass (FromRow, ToRow)
+  deriving
+    (Entity)
+    via (GenericEntity '[TableName "owners"] Owner)
 
 newOwner :: (IOE :> es, Time :> es) => Text -> Eff es Owner
 newOwner ownerName = do
