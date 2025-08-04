@@ -80,10 +80,10 @@ ARG UID
 ARG USER
 ENV USER=$USER
 
-COPY --from=ghcup /out/ghcup /opt/ghcup
 COPY --from=setup-haskell-tools /out /opt/bin
+COPY --from=setup-haskell-tools /opt/ghcup /opt/ghcup
 
-ENV PATH="/opt/ghcup/.ghcup/bin:$PATH"
+ENV PATH="/opt/ghcup/.ghcup/bin:/opt/bin:$PATH"
 
 RUN ghcup install ghc $GHC_VERSION
 RUN ghcup set ghc $GHC_VERSION

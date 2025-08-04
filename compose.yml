@@ -18,13 +18,13 @@ services:
     profiles:
       - local
     depends_on:
-      - database
+      - masna3-database
     working_dir: /home/$USER/masna3
     init: true
 
-  database:
+  masna3-database:
     image: docker.io/library/postgres:17.5
-    container_name: database
+    container_name: masna3-database
     user: postgres
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]

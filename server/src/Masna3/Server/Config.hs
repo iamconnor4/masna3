@@ -6,7 +6,7 @@ import Control.Monad
 import Data.Bifunctor
 import Data.ByteString
 import Data.ByteString.Char8 qualified as BS8
-import Data.Text
+import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Time
 import Data.Typeable

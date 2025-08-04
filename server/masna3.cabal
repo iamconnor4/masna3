@@ -63,11 +63,15 @@ library
   import: ghc-options
   -- cabal-gild: discover src
   exposed-modules:
-    Masna3.Config
     Masna3.Server
     Masna3.Server.Config
+    Masna3.Server.Database
     Masna3.Server.Environment
+    Masna3.Server.Error
     Masna3.Server.File
+    Masna3.Server.Model.Owner.Query
+    Masna3.Server.Model.Owner.Types
+    Masna3.Server.Model.Owner.Update
 
   build-depends:
     base >=4.20 && <4.21,
@@ -76,6 +80,7 @@ library
     bytestring,
     effectful,
     effectful-core,
+    effectful-postgresql,
     envparse,
     heptapod,
     log-base,
