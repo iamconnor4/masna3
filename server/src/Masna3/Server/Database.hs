@@ -1,13 +1,8 @@
 module Masna3.Server.Database where
 
-import Data.Int
-import Data.Pool qualified as Pool
 import Effectful
-import Effectful.Dispatch.Static (unsafeEff_)
-import Effectful.Error.Static (Error)
 import Effectful.PostgreSQL (WithConnection)
 import Effectful.PostgreSQL qualified as DB
-import Effectful.PostgreSQL.Connection.Pool qualified as DB
 import Effectful.Reader.Static (Reader)
 import Effectful.Reader.Static qualified as Reader
 

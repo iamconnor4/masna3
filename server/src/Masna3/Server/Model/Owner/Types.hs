@@ -2,14 +2,12 @@ module Masna3.Server.Model.Owner.Types where
 
 import Data.Text (Text)
 import Data.Time (UTCTime)
-import Data.UUID.Types
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToRow
 import Effectful
 import Effectful.Time (Time)
 import Effectful.Time qualified as Time
 import GHC.Generics
-import Heptapod qualified
 import Masna3.Api.Owner.OwnerId
 
 data Owner = Owner

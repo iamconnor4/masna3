@@ -72,6 +72,7 @@ library
     postgresql-simple,
     servant,
     text,
+    text-display,
     uuid-types,
 
   hs-source-dirs: src
