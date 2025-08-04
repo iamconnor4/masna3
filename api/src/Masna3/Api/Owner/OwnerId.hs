@@ -8,10 +8,10 @@ import Database.PostgreSQL.Simple.ToField
 import GHC.Generics
 import Heptapod qualified
 
-newtype OwnerId = OwnerId {getOwnerId :: UUID}
+newtype OwnerId = OwnerId UUID
   deriving stock (Generic)
   deriving
-    (Eq, FromField, FromJSON, Ord, Show, ToField, ToJSON)
+    (Eq, FromField, FromHttpApiData, FromJSON, Ord, Show, ToField, ToJSON)
     via UUID
 
 newOwnerId :: MonadIO m => m OwnerId

@@ -4,9 +4,8 @@ import Data.Aeson
 import Data.Text
 import Data.UUID.Types
 import GHC.Generics
-import Servant.API
-
 import Masna3.Api.File.Types
+import Servant.API
 
 data FileRegistrationForm = FileRegistrationForm
   { fileName :: Text
