@@ -31,7 +31,7 @@ tags: ## Generate ctags for the project with `ghc-tags`
 	@ghc-tags -c api server
 
 docker-build: ## Build and start the container cluster
-	@docker build .
+	@docker compose build devel
 
 docker-up: ## Start the container cluster
 	@docker compose up -d

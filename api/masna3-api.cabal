@@ -56,7 +56,8 @@ library
   exposed-modules:
     Masna3.Api
     Masna3.Api.File
-    Masna3.Api.File.Types
+    Masna3.Api.File.FileId
+    Masna3.Api.Owner.OwnerId
 
   build-depends:
     aeson,
@@ -68,8 +69,10 @@ library
     bytestring,
     deriving-aeson,
     heptapod,
+    postgresql-simple,
     servant,
     text,
+    text-display,
     uuid-types,
 
   hs-source-dirs: src

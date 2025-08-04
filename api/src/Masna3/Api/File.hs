@@ -6,7 +6,7 @@ import Data.UUID.Types
 import GHC.Generics
 import Servant.API
 
-import Masna3.Api.File.Types
+import Masna3.Api.File.FileId
 
 data FileRegistrationForm = FileRegistrationForm
   { fileName :: Text

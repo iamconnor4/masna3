@@ -13,23 +13,23 @@ FROM ubuntu:$BASE_IMAGE_VERSION AS base
 USER "root"
 ENV LANG="en_GB.UTF-8"
 
-RUN apt update && \
-  apt install -y  \
-    build-essential \
-    curl \
-    git \
-    libffi-dev \
-    libffi8 \
-    libgmp-dev \
-    libgmp10 \
-    libncurses-dev \
-    libncurses5 \
-    libpq-dev \
-    libtinfo5 \
-    locales \
-    pkg-config \
-    postgresql-client \
-    zlib1g-dev
+RUN apt update \
+    && apt install -y \
+        build-essential \
+        curl \
+        git \
+        libffi-dev \
+        libffi8 \
+        libgmp-dev \
+        libgmp10 \
+        libncurses-dev \
+        libncurses5 \
+        libpq-dev \
+        libtinfo5 \
+        locales \
+        pkg-config \
+        postgresql-client \
+        zlib1g-dev
 RUN localedef -i en_GB -c -f UTF-8 -A /usr/share/locale/locale.alias en_GB.UTF-8
 RUN rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
@@ -46,7 +46,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 RUN ghcup install cabal $CABAL_VERSION
 
 # This stage installs haskell tools
-FROM base as setup-haskell-tools
+FROM base AS setup-haskell-tools
 ARG POSTGRESQL_MIGRATION_VERSION
 ARG FOURMOLU_VERSION
 ARG HLINT_VERSION
@@ -80,10 +80,10 @@ ARG UID
 ARG USER
 ENV USER=$USER
 
-COPY --from=ghcup /out/ghcup /opt/ghcup
 COPY --from=setup-haskell-tools /out /opt/bin
+COPY --from=setup-haskell-tools /opt/ghcup /opt/ghcup
 
-ENV PATH="/opt/ghcup/.ghcup/bin:$PATH"
+ENV PATH="/opt/ghcup/.ghcup/bin:/opt/bin:$PATH"
 
 RUN ghcup install ghc $GHC_VERSION
 RUN ghcup set ghc $GHC_VERSION
@@ -92,7 +92,7 @@ RUN apt update
 RUN apt install -y libpq-dev wget tmux postgresql-client direnv
 
 RUN groupadd -g "$GID" -o "$USER" \
-  && useradd -l -r -u "$UID" -g "$GID" -m -s /bin/bash "$USER"
+    && useradd -l -r -u "$UID" -g "$GID" -m -s /bin/bash "$USER"
 
 RUN mkdir /home/$USER/.cabal
 RUN chown -R $UID:$GID /home/$USER
@@ -101,9 +101,9 @@ USER $USER
 
 RUN chown -R $UID:$GID /home/$USER
 RUN mkdir -p /home/$USER/masna3 \
-  && chown -R $UID:$GID /home/$USER/masna3
+    && chown -R $UID:$GID /home/$USER/masna3
 
-RUN echo 'export PATH="$PATH:/home/$USER/.cabal/bin"' >> ~/.bashrc
-RUN echo "source /opt/ghcup/.ghcup/env" >> ~/.bashrc
-RUN echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
-RUN echo 'direnv allow' >> ~/.bashrc
+RUN echo 'export PATH="$PATH:/home/$USER/.cabal/bin"' >>~/.bashrc
+RUN echo "source /opt/ghcup/.ghcup/env" >>~/.bashrc
+RUN echo 'eval "$(direnv hook bash)"' >>~/.bashrc
+RUN echo 'direnv allow' >>~/.bashrc

@@ -1,12 +1,14 @@
 module Masna3.Server.Config where
 
+import Amazonka qualified as AWS
+import Amazonka.S3.Internal (BucketName, Region)
 import Auth.Biscuit
 import Auth.Biscuit.Utils
 import Control.Monad
 import Data.Bifunctor
 import Data.ByteString
 import Data.ByteString.Char8 qualified as BS8
-import Data.Text
+import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Time
 import Data.Typeable
@@ -55,6 +57,10 @@ data Masna3Config = Masna3Config
   , deployed :: Bool
   , publicKey :: PublicKey
   , secretKey :: SecretKey
+  , awsKeyId :: AWS.AccessKey
+  , awsSecret :: AWS.Sensitive AWS.SecretKey
+  , awsRegion :: Region
+  , awsBucket :: BucketName
   }
   deriving stock (Generic, Show)
 
@@ -123,6 +129,10 @@ parseConfig =
     <*> parseDeployed
     <*> parsePublicKeyFromEnv
     <*> parseSecretKeyFromEnv
+    <*> var nonempty "MASNA3_AWS_KEY_ID" (help "AWS Access Key ID")
+    <*> var nonempty "MASNA3_AWS_SECRET_KEY" (help "AWS Secret Key")
+    <*> var nonempty "MASNA3_AWS_REGION" (help "AWS Region")
+    <*> var nonempty "MASNA3_AWS_BUCKET" (help "AWS Bucket")
 
 parseTestConfig :: Parser Error TestConfig
 parseTestConfig =

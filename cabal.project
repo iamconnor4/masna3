@@ -2,15 +2,23 @@ packages:
   ./server
   ./api
 
-with-compiler: ghc-9.10.1
+with-compiler: ghc-9.10.2
+with-hc-pkg: ghc-pkg-9.10.2
 semaphore: True
 tests: True
 jobs: $ncpus
 multi-repl: True
-documentation: True
+
+package *
+  gcc-options: -march=native
+
 allow-newer:
+  amazonka-s3:*,
   amazonka:*,
-  amazonka-s3:*
+  effectful-postgresql:*,
+  pg-entity:*,
+  postgresql-simple-named:*,
+  unliftio-pool:*,
 
 source-repository-package
   type: git
