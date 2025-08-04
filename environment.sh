@@ -25,4 +25,12 @@ export MASNA3_ZIPKIN_AGENT_HOST=""
 # The port of the Zipkin collection agent
 export MASNA3_ZIPKIN_AGENT_PORT=""
 
+export MASNA3_AWS_KEY_ID="fake-key-id"
+
+export MASNA3_AWS_SECRET_KEY="fake-id"
+
+export MASNA3_AWS_REGION="Paris"
+
+export MASNA3_AWS_BUCKET="masna3-dev"
+
 export DOCKER_BUILDKIT=1

@@ -64,6 +64,7 @@ library
   -- cabal-gild: discover src
   exposed-modules:
     Masna3.Server
+    Masna3.Server.AWS.URL
     Masna3.Server.Config
     Masna3.Server.Database
     Masna3.Server.Environment
@@ -77,6 +78,8 @@ library
     Masna3.Server.Model.Owner.Update
 
   build-depends:
+    amazonka,
+    amazonka-s3,
     base >=4.20 && <4.21,
     biscuit-haskell,
     biscuit-servant,

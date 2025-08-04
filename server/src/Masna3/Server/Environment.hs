@@ -1,5 +1,7 @@
 module Masna3.Server.Environment where
 
+import Amazonka
+import Amazonka.S3.Internal (BucketName)
 import Auth.Biscuit (PublicKey)
 import Data.ByteString (StrictByteString)
 import Data.Pool (Pool)
@@ -23,6 +25,9 @@ data Masna3Env = Masna3Env
   , mltp :: MLTP
   , deployed :: Bool
   , publicKey :: PublicKey
+  , s3AuthEnv :: AuthEnv
+  , awsRegion :: Region
+  , awsBucket :: BucketName
   }
   deriving stock (Generic)
 
@@ -46,6 +51,7 @@ configToEnv masna3Config = do
   let PoolConfig{connectionTimeout, connections} = masna3Config.dbConfig
   pool <- mkPool masna3Config.connectionInfo connectionTimeout connections
   jobsPool <- mkPool masna3Config.connectionInfo connectionTimeout connections
+  let s3AuthEnv = AuthEnv masna3Config.awsKeyId masna3Config.awsSecret Nothing Nothing
   pure
     Masna3Env
       { pool = pool
@@ -56,6 +62,9 @@ configToEnv masna3Config = do
       , mltp = masna3Config.mltp
       , deployed = masna3Config.deployed
       , publicKey = masna3Config.publicKey
+      , s3AuthEnv
+      , awsRegion = masna3Config.awsRegion
+      , awsBucket = masna3Config.awsBucket
       }
 
 getMasna3Env :: IOE :> es => Eff es Masna3Env
