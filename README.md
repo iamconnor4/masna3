@@ -16,3 +16,7 @@ run `make build` to build the whole project, API and server.
 
 The point of this project is to provide a high-quality Haskell codebase that uses state-of-the-art practices for software architecture and documentation.
 The code must be as readable as possible for newcomers, and be usable as examples to display software engineering best practices.
+
+## 🍎 The origins
+
+This project condenses the knowledge that I have gotten from my years of industrial Haskell. This pattern of a separate file-handling service has emerged over several companies where I worked, and I find this a well-scoped project to do pair-programming.
