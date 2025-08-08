@@ -1,13 +1,13 @@
 module Masna3.Api.File where
 
 import Data.Aeson
-import Data.Text
 import Data.FileId.Types
+import Data.Text
 import GHC.Generics
+import Masna3.Api.File.OwnerId
 import Servant.API
 
 import Masna3.Api.File.FileId
-import Masna3.Api.File.OwnerId
 
 data FileRegistrationForm = FileRegistrationForm
   { fileName :: Text

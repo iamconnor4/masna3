@@ -9,7 +9,7 @@ registerHandler :: FileRegistrationForm -> Eff es FileRegistrationResult
 registerHandler form = do
   fileId <- newFileId
 
-  pure FileRegistrationResult {fileId , url}
+  pure FileRegistrationResult{fileId, url}
 
 confirmHandler :: FileId -> UploadConfirmationForm -> Eff es NoContent
 confirmHandler = undefined

@@ -40,11 +40,8 @@ newPutURL bucketName mimetype path = do
       NorthVirginia
       timestamp
       (60 * 5) -- 5 minutes
-      (
-        newPutObject
+      ( newPutObject
           bucketName
           (ObjectKey path)
-          (
-            toBody $ "Content-Type=" <> mimetype
-          )
+          (toBody $ "Content-Type=" <> mimetype)
       )
