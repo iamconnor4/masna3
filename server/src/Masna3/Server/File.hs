@@ -6,7 +6,10 @@ import Masna3.Api.File.FileId
 import Servant.API.ContentTypes
 
 registerHandler :: FileRegistrationForm -> Eff es FileRegistrationResult
-registerHandler = undefined
+registerHandler form = do
+  fileId <- newFileId
+
+  pure FileRegistrationResult {fileId , url}
 
 confirmHandler :: FileId -> UploadConfirmationForm -> Eff es NoContent
 confirmHandler = undefined

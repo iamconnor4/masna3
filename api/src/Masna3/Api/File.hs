@@ -2,35 +2,36 @@ module Masna3.Api.File where
 
 import Data.Aeson
 import Data.Text
-import Data.UUID.Types
+import Data.FileId.Types
 import GHC.Generics
 import Servant.API
 
 import Masna3.Api.File.FileId
+import Masna3.Api.File.OwnerId
 
 data FileRegistrationForm = FileRegistrationForm
   { fileName :: Text
-  , owner :: Text
+  , owner :: OwnerId
   , mimetype :: Text
   }
   deriving stock (Eq, Generic, Ord, Show)
   deriving anyclass (FromJSON, ToJSON)
 
 data FileRegistrationResult = FileRegistrationResult
-  { fileId :: UUID
+  { fileId :: FileId
   , url :: Text
   }
   deriving stock (Eq, Generic, Ord, Show)
   deriving anyclass (FromJSON, ToJSON)
 
 data UploadConfirmationForm = UploadConfirmationForm
-  { fileId :: UUID
+  { fileId :: FileId
   }
   deriving stock (Eq, Generic, Ord, Show)
   deriving anyclass (FromJSON, ToJSON)
 
 data UploadCancellationForm = UploadCancellationForm
-  { fileId :: UUID
+  { fileId :: FileId
   }
   deriving stock (Eq, Generic, Ord, Show)
   deriving anyclass (FromJSON, ToJSON)

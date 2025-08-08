@@ -23,10 +23,28 @@ newGetURL bucketName path = do
   pure $
     presignURL
       s3AuthEnv
-      Paris
+      NorthVirginia
       timestamp
       (60 * 5) -- 5 minutes
       ( newGetObject
           bucketName
           (ObjectKey path)
+      )
+
+newPutURL bucketName mimetype path = do
+  Masna3Env{s3AuthEnv} <- Reader.ask
+  timestamp <- Time.currentTime
+  pure $
+    presignURL
+      s3AuthEnv
+      NorthVirginia
+      timestamp
+      (60 * 5) -- 5 minutes
+      (
+        newPutObject
+          bucketName
+          (ObjectKey path)
+          (
+            toBody $ "Content-Type=" <> mimetype
+          )
       )
