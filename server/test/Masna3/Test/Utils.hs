@@ -19,8 +19,8 @@ import Masna3.Server.Error
 type TestEff a =
   Eff
     '[ Time
-     , Reader Masna3Env
      , Error Masna3Error
+     , Reader Masna3Env
      , IOE
      ]
     a
@@ -29,8 +29,8 @@ runTestEff :: TestEff a -> Masna3Env -> IO a
 runTestEff action env = runEff $ do
   action
     & Time.runTime
-    & Reader.runReader env
     & Error.runErrorWith handleTestSuiteError
+    & Reader.runReader env
   where
     handleTestSuiteError :: IOE :> es => CallStack -> Masna3Error -> Eff es a
     handleTestSuiteError callstack err = do

@@ -1,18 +1,17 @@
 module Masna3.Api.File where
 
 import Data.Aeson
-import Data.FileId.Types
 import Data.Text
 import GHC.Generics
-import Masna3.Api.File.OwnerId
 import Servant.API
 
 import Masna3.Api.File.FileId
+import Masna3.Api.Owner.OwnerId
 
 data FileRegistrationForm = FileRegistrationForm
   { fileName :: Text
-  , owner :: OwnerId
-  , mimetype :: Text
+  , ownerId :: OwnerId
+  , mimeType :: Text
   }
   deriving stock (Eq, Generic, Ord, Show)
   deriving anyclass (FromJSON, ToJSON)

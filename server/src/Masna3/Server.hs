@@ -7,6 +7,8 @@ import Effectful
 import Effectful.Error.Static
 import Effectful.Log (Log)
 import Effectful.Log qualified as Log
+import Effectful.Reader.Static (Reader)
+import Effectful.Reader.Static qualified as Reader
 import Effectful.Time
 import Log (Logger)
 import Masna3.Api
@@ -18,15 +20,9 @@ import Servant.API (NamedRoutes)
 import Servant.Server
 import Servant.Server.Generic
 
+import Masna3.Server.Effects
 import Masna3.Server.Environment
 import Masna3.Server.File
-
-type RouteEffects =
-  [ Error ServerError
-  , Log
-  , Time
-  , IOE
-  ]
 
 runMasna3
   :: IOE :> es
@@ -52,20 +48,22 @@ makeServer logger environment =
   serveWithContextT
     (Proxy @(NamedRoutes ServerRoutes))
     (genBiscuitCtx environment.publicKey)
-    (handleRoute logger)
+    (handleRoute logger environment)
     masna3Server
 
 handleRoute
   :: Logger
+  -> Masna3Env
   -> Eff RouteEffects a
   -> Handler a
-handleRoute logger action = do
+handleRoute logger env action = do
   err <-
     liftIO $
       Right <$> action
         & runErrorNoCallStackWith handleServerError
         & Log.runLog "masna3-server" logger Log.defaultLogLevel
         & runTime
+        & Reader.runReader env
         & runEff
   either Servant.throwError pure err
 

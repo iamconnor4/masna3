@@ -4,6 +4,7 @@ module Masna3.Server.Model.File.Types
   , newFile
   ) where
 
+import Amazonka.S3.Internal (BucketName (..), Region)
 import Data.ByteString.Char8 qualified as BS8
 import Data.Time (UTCTime)
 import Database.PostgreSQL.Entity
@@ -30,7 +31,7 @@ data File = File
   , filename :: Text
   , path :: Text
   , status :: Status
-  , bucket :: Text
+  , bucket :: BucketName
   , mimetype :: Text
   , createdAt :: UTCTime
   , updatedAt :: Maybe UTCTime
@@ -57,13 +58,16 @@ instance FromRow File where
       _ -> error $ "Inconsistent status: " <> show (status', uploadedAt)
     pure File{..}
 
+deriving via Text instance FromField BucketName
+deriving via Text instance ToField BucketName
+
 newFile
   :: (IOE :> es, Time :> es)
   => OwnerId
   -- ^ Owner
   -> Text
   -- ^ File name
-  -> Text
+  -> BucketName
   -- ^ Bucket
   -> Text
   -- ^ MIME type
@@ -112,7 +116,7 @@ data File' = File'
   , filename :: Text
   , path :: Text
   , status' :: Status'
-  , bucket :: Text
+  , bucket :: BucketName
   , mimetype :: Text
   , createdAt :: UTCTime
   , updatedAt :: Maybe UTCTime

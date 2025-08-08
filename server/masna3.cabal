@@ -67,6 +67,7 @@ library
     Masna3.Server.AWS.URL
     Masna3.Server.Config
     Masna3.Server.Database
+    Masna3.Server.Effects
     Masna3.Server.Environment
     Masna3.Server.Error
     Masna3.Server.File
@@ -146,6 +147,7 @@ test-suite masna3-test
   hs-source-dirs: test
   -- cabal-gild: discover test --exclude "test/Main.hs"
   other-modules:
+    Masna3.Test.File
     Masna3.Test.Utils
 
   build-depends:
