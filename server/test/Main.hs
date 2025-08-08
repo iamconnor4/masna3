@@ -9,6 +9,7 @@ import Test.Tasty
 
 import Masna3.Server.Database
 import Masna3.Server.Environment
+import Masna3.Test.File qualified as File
 import Masna3.Test.Utils
 
 main :: IO ()
@@ -21,7 +22,9 @@ main = do
     testGroup "Masna3 Tests" tests
 
 specs :: [TestEff TestTree]
-specs = []
+specs =
+  [ File.spec
+  ]
 
 cleanUp :: (IOE :> es, WithConnection :> es) => Eff es ()
 cleanUp = do

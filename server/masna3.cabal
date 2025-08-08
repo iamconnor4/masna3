@@ -164,4 +164,6 @@ test-suite masna3-test
     postgresql-simple,
     tasty,
     tasty-hunit,
+    text,
+    text-display,
     time,

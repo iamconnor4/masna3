@@ -49,5 +49,16 @@ testThese groupName tests = fmap (Test.testGroup groupName) newTests
     newTests :: TestEff [TestTree]
     newTests = sequenceA tests
 
+assertEqual :: (Eq a, HasCallStack, Show a) => String -> a -> a -> TestEff ()
+assertEqual message expected actual = liftIO $ Test.assertEqual message expected actual
+
 assertBool :: HasCallStack => String -> Bool -> TestEff ()
 assertBool message assertion = liftIO $ Test.assertBool message assertion
+
+assertJust :: HasCallStack => String -> Maybe a -> TestEff a
+assertJust _ (Just a) = pure a
+assertJust message Nothing = liftIO $ Test.assertFailure message
+
+assertRight :: HasCallStack => String -> Either a b -> TestEff b
+assertRight _ (Right b) = pure b
+assertRight message (Left _a) = liftIO $ Test.assertFailure message

@@ -1,3 +1,6 @@
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE QuasiQuotes #-}
+
 module Masna3.Server.Model.File.Types
   ( Status (..)
   , File (..)
@@ -10,7 +13,7 @@ import Data.Time (UTCTime)
 import Database.PostgreSQL.Entity
 import Database.PostgreSQL.Entity.Types
 import Database.PostgreSQL.Simple.FromField
-import Database.PostgreSQL.Simple.FromRow
+import Database.PostgreSQL.Simple.FromRow hiding (field)
 import Database.PostgreSQL.Simple.ToField
 import Database.PostgreSQL.Simple.ToRow
 import Effectful
@@ -37,9 +40,22 @@ data File = File
   , updatedAt :: Maybe UTCTime
   }
   deriving stock (Eq, Generic, Ord, Show)
-  deriving
-    (Entity)
-    via (GenericEntity '[TableName "files"] File)
+
+instance Entity File where
+  tableName = "files"
+  primaryKey = [field| file_id |]
+  fields =
+    [ [field| file_id |]
+    , [field| owner_id |]
+    , [field| filename |]
+    , [field| path |]
+    , [field| status |]
+    , [field| bucket |]
+    , [field| mimetype |]
+    , [field| created_at |]
+    , [field| updated_at |]
+    , [field| uploaded_at |]
+    ]
 
 instance ToRow File where
   toRow File{..} =

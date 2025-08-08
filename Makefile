@@ -69,7 +69,7 @@ db-init: ## Create the database schema
 db-migrate: ## Apply database migrations
 	@migrate migrate "$(MASNA3_DB_CONNSTRING)" migrations
 
-db-reset: db-drop db-setup db-provision ## Reset the dev database
+db-reset: db-drop db-setup ## Reset the dev database
 
 help: ## Display this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.* ?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
