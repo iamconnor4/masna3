@@ -31,9 +31,9 @@ export MASNA3_SECRET_KEY="b17b436d9e2b60028a2a6bc58b5a4223c4927c829408d37ee82fc3
 # Is Zipkin trace collection enabled? (default false)
 export MASNA3_ZIPKIN_ENABLED="false"
 # The hostname of the Zipkin collection agent
-export MASNA3_ZIPKIN_AGENT_HOST=""
+export MASNA3_ZIPKIN_AGENT_HOST="localhost"
 # The port of the Zipkin collection agent
-export MASNA3_ZIPKIN_AGENT_PORT=""
+export MASNA3_ZIPKIN_AGENT_PORT="8028"
 
 export MASNA3_AWS_KEY_ID="fake-key-id"
 

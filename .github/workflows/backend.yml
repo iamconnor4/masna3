@@ -88,6 +88,7 @@ jobs:
     - name: Test
       run: |
         set -x
+        cabal install postgresql-migration
         source ./environment.ci.sh
         createdb -h "${MASNA3_DB_HOST}" -p "${MASNA3_DB_PORT}" -U "${MASNA3_DB_USER}" -w "${MASNA3_DB_DATABASE}"
         migrate init "${MASNA3_DB_CONNSTRING}"
