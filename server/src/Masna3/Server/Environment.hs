@@ -6,7 +6,6 @@ import Auth.Biscuit (PublicKey)
 import Data.ByteString (StrictByteString)
 import Data.Pool (Pool)
 import Data.Pool qualified as Pool
-import Data.Text (Text)
 import Data.Time
 import Data.Word
 import Database.PostgreSQL.Simple qualified as PG
@@ -69,5 +68,5 @@ configToEnv masna3Config = do
 
 getMasna3Env :: IOE :> es => Eff es Masna3Env
 getMasna3Env = do
-  config <- liftIO $ Env.parse id parseConfig
+  config <- liftIO $ Env.parse identity parseConfig
   configToEnv config

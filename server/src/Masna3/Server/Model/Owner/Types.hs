@@ -1,6 +1,5 @@
 module Masna3.Server.Model.Owner.Types where
 
-import Data.Text (Text)
 import Data.Time (UTCTime)
 import Database.PostgreSQL.Entity
 import Database.PostgreSQL.Entity.Types

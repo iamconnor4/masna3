@@ -4,7 +4,6 @@ import Amazonka.Presign
 import Amazonka.S3.GetObject
 import Amazonka.S3.Internal
 import Data.ByteString
-import Data.Text
 import Effectful
 import Effectful.Reader.Static (Reader)
 import Effectful.Reader.Static qualified as Reader

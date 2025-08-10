@@ -91,6 +91,7 @@ library
     heptapod,
     log-base,
     log-effectful,
+    masna3:masna3-prelude,
     masna3-api,
     monad-time-effectful,
     network,
@@ -107,7 +108,22 @@ library
     wai-log,
     warp,
 
+  mixins:
+    base hiding (Prelude),
+    masna3:masna3-prelude (Prelude),
+
   hs-source-dirs: src
+
+library masna3-prelude
+  import: extensions
+  import: ghc-options
+  exposed-modules: Prelude
+  hs-source-dirs: prelude
+  build-depends:
+    base,
+    text,
+    text-display,
+    vector,
 
 executable masna3-server
   import: extensions
