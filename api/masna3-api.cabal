@@ -55,6 +55,7 @@ library
   -- cabal-gild: discover src
   exposed-modules:
     Masna3.Api
+    Masna3.Api.Client
     Masna3.Api.File
     Masna3.Api.File.FileId
     Masna3.Api.Owner.OwnerId
@@ -71,6 +72,7 @@ library
     heptapod,
     postgresql-simple,
     servant,
+    servant-client,
     text,
     text-display,
     uuid-types,

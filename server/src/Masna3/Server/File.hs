@@ -1,6 +1,5 @@
 module Masna3.Server.File where
 
-import Data.Text.Display
 import Data.Text.Encoding qualified as Text
 import Effectful
 import Effectful.Reader.Static qualified as Reader
@@ -35,7 +34,7 @@ registerHandler form = do
   pure FileRegistrationResult{fileId = file.fileId, url}
 
 confirmHandler :: FileId -> UploadConfirmationForm -> Eff es NoContent
-confirmHandler = undefined
+confirmHandler _ _ = pure NoContent
 
 cancelHandler :: FileId -> UploadCancellationForm -> Eff es NoContent
-cancelHandler = undefined
+cancelHandler _ _ = pure NoContent

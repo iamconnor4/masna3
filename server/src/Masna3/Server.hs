@@ -1,13 +1,10 @@
 module Masna3.Server where
 
 import Auth.Biscuit.Servant
-import Data.Function ((&))
 import Data.Proxy
 import Effectful
 import Effectful.Error.Static
-import Effectful.Log (Log)
 import Effectful.Log qualified as Log
-import Effectful.Reader.Static (Reader)
 import Effectful.Reader.Static qualified as Reader
 import Effectful.Time
 import Log (Logger)
@@ -59,25 +56,25 @@ handleRoute
 handleRoute logger env action = do
   err <-
     liftIO $
-      Right <$> action
-        & runErrorNoCallStackWith handleServerError
-        & Log.runLog "masna3-server" logger Log.defaultLogLevel
-        & runTime
-        & Reader.runReader env
-        & runEff
+      Right
+        <$> action
+          & runErrorNoCallStackWith handleServerError
+          & Log.runLog "masna3-server" logger Log.defaultLogLevel
+          & runTime
+          & Reader.runReader env
+          & runEff
   either Servant.throwError pure err
 
 masna3Server :: ServerRoutes (AsServerT (Eff RouteEffects))
 masna3Server =
   ServerRoutes
     { api = apiServer
-    , documentation = undefined
     }
 
 apiServer :: ServerT (NamedRoutes APIRoutes) (Eff RouteEffects)
 apiServer =
   APIRoutes
-    { file = fileServer
+    { files = fileServer
     }
 
 fileServer :: ServerT (NamedRoutes FileRoutes) (Eff RouteEffects)

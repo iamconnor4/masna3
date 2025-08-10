@@ -3,7 +3,6 @@
 
 module Masna3.Server.Model.File.Query where
 
-import Data.Maybe
 import Database.PostgreSQL.Entity
 import Database.PostgreSQL.Entity.Internal.QQ
 import Database.PostgreSQL.Simple.FromRow (FromRow (..))

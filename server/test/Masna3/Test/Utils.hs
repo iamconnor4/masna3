@@ -1,6 +1,6 @@
 module Masna3.Test.Utils where
 
-import Data.Function ((&))
+import Data.Word
 import Effectful
 import Effectful.Error.Static (Error)
 import Effectful.Error.Static qualified as Error
@@ -9,6 +9,9 @@ import Effectful.Reader.Static qualified as Reader
 import Effectful.Time (Time)
 import Effectful.Time qualified as Time
 import GHC.Stack
+import Network.HTTP.Client (defaultManagerSettings, newManager)
+import Servant.Client
+import Servant.Client.Core
 import Test.Tasty (TestTree)
 import Test.Tasty qualified as Test
 import Test.Tasty.HUnit qualified as Test
@@ -43,7 +46,7 @@ testThis name assertion = do
   let test = runTestEff assertion env
   pure $ Test.testCase name test
 
-testThese :: HasCallStack => String -> [TestEff TestTree] -> TestEff TestTree
+testThese :: String -> [TestEff TestTree] -> TestEff TestTree
 testThese groupName tests = fmap (Test.testGroup groupName) newTests
   where
     newTests :: TestEff [TestTree]
@@ -62,3 +65,11 @@ assertJust message Nothing = liftIO $ Test.assertFailure message
 assertRight :: HasCallStack => String -> Either a b -> TestEff b
 assertRight _ (Right b) = pure b
 assertRight message (Left _a) = liftIO $ Test.assertFailure message
+
+runRequest :: ClientM a -> TestEff (Either ClientError a)
+runRequest request = do
+  env <- Reader.ask @Masna3Env
+  manager <- liftIO $ newManager defaultManagerSettings
+  url <- parseBaseUrl "localhost"
+  let clientEnv = mkClientEnv manager $ url{baseUrlPort = fromIntegral @Word16 @Int env.httpPort}
+  liftIO $ runClientM request clientEnv

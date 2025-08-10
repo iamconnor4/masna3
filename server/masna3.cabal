@@ -137,6 +137,11 @@ executable masna3-server
     effectful,
     log-base,
     masna3,
+    masna3:masna3-prelude,
+
+  mixins:
+    base hiding (Prelude),
+    masna3:masna3-prelude (Prelude),
 
 test-suite masna3-test
   import: extensions
@@ -153,17 +158,29 @@ test-suite masna3-test
   build-depends:
     aeson,
     base,
+    effectful,
     effectful-core,
     effectful-postgresql,
+    http-client,
     log-base,
     log-effectful,
     masna3,
+    masna3:masna3-prelude,
     masna3-api,
     monad-time-effectful,
     postgresql-migration,
     postgresql-simple,
+    servant-client,
+    servant-client-core,
+    strict-mutable-base,
     tasty,
     tasty-hunit,
     text,
     text-display,
     time,
+    wai-log,
+    warp,
+
+  mixins:
+    base hiding (Prelude),
+    masna3:masna3-prelude (Prelude),

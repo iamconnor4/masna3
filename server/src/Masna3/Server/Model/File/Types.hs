@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 module Masna3.Server.Model.File.Types
   ( Status (..)
@@ -7,7 +8,7 @@ module Masna3.Server.Model.File.Types
   , newFile
   ) where
 
-import Amazonka.S3.Internal (BucketName (..), Region)
+import Amazonka.S3.Internal (BucketName (..))
 import Data.ByteString.Char8 qualified as BS8
 import Data.Time (UTCTime)
 import Database.PostgreSQL.Entity
