@@ -5,8 +5,6 @@ module Masna3.Server.Model.File.Types
   ) where
 
 import Data.ByteString.Char8 qualified as BS8
-import Data.Text (Text)
-import Data.Text.Display
 import Data.Time (UTCTime)
 import Database.PostgreSQL.Entity
 import Database.PostgreSQL.Entity.Types
@@ -15,7 +13,6 @@ import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.ToField
 import Database.PostgreSQL.Simple.ToRow
 import Effectful
-import Effectful.PostgreSQL
 import Effectful.Time (Time)
 import Effectful.Time qualified as Time
 import GHC.Generics

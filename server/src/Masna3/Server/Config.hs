@@ -4,11 +4,9 @@ import Amazonka qualified as AWS
 import Amazonka.S3.Internal (BucketName, Region)
 import Auth.Biscuit
 import Auth.Biscuit.Utils
-import Control.Monad
 import Data.Bifunctor
 import Data.ByteString
 import Data.ByteString.Char8 qualified as BS8
-import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Time
 import Data.Typeable
