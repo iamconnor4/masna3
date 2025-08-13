@@ -7,12 +7,17 @@ import Auth.Biscuit.Utils
 import Data.Bifunctor
 import Data.ByteString
 import Data.ByteString.Char8 qualified as BS8
+import Data.IntMap.Strict (IntMap)
+import Data.Pool
 import Data.Text qualified as Text
 import Data.Time
 import Data.Typeable
 import Data.Word
+import Database.PostgreSQL.Simple qualified as PG
+import Effectful.Concurrent.MVar.Strict (MVar')
 import Env
 import GHC.Generics
+import Log.Backend.LogList (LogList)
 import Network.Socket (HostName, PortNumber)
 import Text.Read (readMaybe)
 
@@ -47,7 +52,7 @@ data MLTP = MLTP
 
 -- | The datatype that is used to model the external configuration
 data Masna3Config = Masna3Config
-  { dbConfig :: PoolConfig
+  { dbConfig :: ConnectionPoolConfig
   , connectionInfo :: StrictByteString
   , domain :: Text
   , httpPort :: Word16
@@ -62,7 +67,7 @@ data Masna3Config = Masna3Config
   }
   deriving stock (Generic, Show)
 
-data PoolConfig = PoolConfig
+data ConnectionPoolConfig = ConnectionPoolConfig
   { connectionTimeout :: NominalDiffTime
   , connections :: Int
   }
@@ -70,19 +75,26 @@ data PoolConfig = PoolConfig
 
 data TestConfig = TestConfig
   { httpPort :: Word16
-  , dbConfig :: PoolConfig
+  , dbConfig :: ConnectionPoolConfig
   , connectionInfo :: StrictByteString
   , mltp :: MLTP
   }
   deriving stock (Generic)
 
+data TestEnv = TestEnv
+  { httpPort :: Word16
+  , pool :: Pool PG.Connection
+  , logSemaphore :: MVar' ()
+  -- ^ Used to display one set of log entries at a time
+  }
+
 parseConnectionInfo :: Parser Error StrictByteString
 parseConnectionInfo =
   var str "MASNA3_DB_CONNSTRING" (help "libpq-compatible connection string")
 
-parsePoolConfig :: Parser Error PoolConfig
+parsePoolConfig :: Parser Error ConnectionPoolConfig
 parsePoolConfig =
-  PoolConfig
+  ConnectionPoolConfig
     <$> var timeout "MASNA3_DB_TIMEOUT" (help "Timeout for each connection")
     <*> var
       (int >=> nonNegative)

@@ -10,10 +10,10 @@ import Effectful
 import Effectful.Error.Static (Error)
 import Effectful.Error.Static qualified as Error
 import Effectful.PostgreSQL
+import Masna3.Api.Owner.OwnerId
 
 import Masna3.Server.Error
 import Masna3.Server.Model.Owner.Types
-import Masna3.Api.Owner.OwnerId
 
 getOwnerById
   :: ( Error Masna3Error :> es

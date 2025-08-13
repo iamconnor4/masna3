@@ -25,6 +25,7 @@ RUN apt update \
         libncurses-dev \
         libncurses5 \
         libpq-dev \
+        libsodium-dev \
         libtinfo5 \
         locales \
         pkg-config \

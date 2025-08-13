@@ -1,21 +1,42 @@
-module Masna3.Test.Utils where
+module Masna3.Test.Utils
+  ( TestEff
+  , TestEnv (..)
+  , withTestPool
+  , testThis
+  , assertEqual
+  , assertBool
+  , assertJust
+  , assertRight
+  , runRequest
+  , getTestEnv
+  ) where
 
+import Data.Text qualified as Text
+import Data.Text.IO qualified as Text
 import Data.Word
 import Effectful
+import Effectful.Concurrent.MVar.Strict (Concurrent)
+import Effectful.Concurrent.MVar.Strict qualified as MVar
 import Effectful.Error.Static (Error)
 import Effectful.Error.Static qualified as Error
+import Effectful.Exception
+import Effectful.Log (Log)
+import Effectful.Log qualified as Log
+import Effectful.PostgreSQL (WithConnection)
+import Effectful.PostgreSQL qualified as DB
 import Effectful.Reader.Static (Reader)
 import Effectful.Reader.Static qualified as Reader
 import Effectful.Time (Time)
 import Effectful.Time qualified as Time
+import Env qualified
 import GHC.Stack
+import Log.Backend.LogList qualified as Log
 import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Servant.Client
-import Servant.Client.Core
 import Test.Tasty (TestTree)
-import Test.Tasty qualified as Test
 import Test.Tasty.HUnit qualified as Test
 
+import Masna3.Server.Config
 import Masna3.Server.Environment
 import Masna3.Server.Error
 
@@ -23,34 +44,46 @@ type TestEff a =
   Eff
     '[ Time
      , Error Masna3Error
-     , Reader Masna3Env
+     , Reader TestEnv
+     , Log
+     , Concurrent
      , IOE
      ]
     a
 
-runTestEff :: TestEff a -> Masna3Env -> IO a
-runTestEff action env = runEff $ do
-  action
-    & Time.runTime
-    & Error.runErrorWith handleTestSuiteError
-    & Reader.runReader env
+withTestPool
+  :: forall a es
+   . (IOE :> es, Reader TestEnv :> es)
+  => Eff (WithConnection ': es) a -> Eff es a
+withTestPool action = do
+  TestEnv{pool} <- Reader.ask
+  DB.runWithConnectionPool pool $ do
+    DB.withTransaction action
+
+testThis :: TestEnv -> Text -> TestEff () -> TestTree
+testThis env name assertion = Test.testCase (Text.unpack name) $ do
+  runEff . MVar.runConcurrent $ do
+    logList <- Log.newLogList
+    let displayLogsOnException :: (Concurrent :> es, IOE :> es) => Eff es ()
+        displayLogsOnException = do
+          MVar.withMVar' env.logSemaphore $ \() -> liftIO $ do
+            Text.putStrLn $ "Logs from tests: " <> name <> ":"
+            logs <- Log.getLogList logList
+            forM_ logs (Text.putStrLn . Log.showLogMessage Nothing)
+    do
+      -- bracket_ insertList deleteList $ do
+      Log.withLogListLogger logList $ \logger -> do
+        assertion
+          & Time.runTime
+          & Error.runErrorWith handleTestSuiteError
+          & Reader.runReader env
+          & Log.runLog "masna3-test" logger Log.defaultLogLevel
+          & (`onException` displayLogsOnException)
   where
     handleTestSuiteError :: IOE :> es => CallStack -> Masna3Error -> Eff es a
     handleTestSuiteError callstack err = do
       liftIO $ putStrLn $ prettyCallStack callstack
       error (show err)
-
-testThis :: HasCallStack => String -> TestEff () -> TestEff TestTree
-testThis name assertion = do
-  env <- Reader.ask @Masna3Env
-  let test = runTestEff assertion env
-  pure $ Test.testCase name test
-
-testThese :: String -> [TestEff TestTree] -> TestEff TestTree
-testThese groupName tests = fmap (Test.testGroup groupName) newTests
-  where
-    newTests :: TestEff [TestTree]
-    newTests = sequenceA tests
 
 assertEqual :: (Eq a, HasCallStack, Show a) => String -> a -> a -> TestEff ()
 assertEqual message expected actual = liftIO $ Test.assertEqual message expected actual
@@ -68,8 +101,25 @@ assertRight message (Left _a) = liftIO $ Test.assertFailure message
 
 runRequest :: ClientM a -> TestEff (Either ClientError a)
 runRequest request = do
-  env <- Reader.ask @Masna3Env
+  env <- Reader.ask @TestEnv
   manager <- liftIO $ newManager defaultManagerSettings
   url <- parseBaseUrl "localhost"
   let clientEnv = mkClientEnv manager $ url{baseUrlPort = fromIntegral @Word16 @Int env.httpPort}
   liftIO $ runClientM request clientEnv
+
+getTestEnv :: (Concurrent :> es, IOE :> es) => Eff es TestEnv
+getTestEnv = do
+  config <- liftIO $ Env.parse identity parseTestConfig
+  testConfigToEnv config
+  where
+    testConfigToEnv :: (Concurrent :> es, IOE :> es) => TestConfig -> Eff es TestEnv
+    testConfigToEnv config = do
+      let ConnectionPoolConfig{connectionTimeout, connections} = config.dbConfig
+      pool <- mkPool config.connectionInfo connectionTimeout connections
+      logSemaphore <- MVar.newEmptyMVar'
+      pure
+        TestEnv
+          { pool = pool
+          , httpPort = config.httpPort
+          , logSemaphore = logSemaphore
+          }

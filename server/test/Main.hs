@@ -1,51 +1,47 @@
 module Main where
 
 import Control.Concurrent.MVar.Strict qualified as IOMVar
+import Data.Word
 import Effectful
 import Effectful.Concurrent.Async
-import Effectful.Concurrent.MVar.Strict qualified as MVar
 import Effectful.Log qualified as Log
 import Effectful.PostgreSQL
 import Effectful.Reader.Static qualified as Reader
 import Log.Backend.StandardOutput qualified as Log
 import Network.Wai.Handler.Warp
 import Network.Wai.Log qualified as WaiLog
-import System.IO
 import Test.Tasty
 
 import Masna3.Server
-import Masna3.Server.Database
 import Masna3.Server.Environment
 import Masna3.Test.File qualified as File
 import Masna3.Test.Utils
 
 main :: IO ()
 main = do
-  hSetBuffering stdout LineBuffering
-  env <- runEff getMasna3Env
-  runEff $ Reader.runReader env $ withPool cleanUp
-  tests <- traverse (`runTestEff` env) specs
+  testEnv' :: TestEnv <- runEff . runConcurrent $ getTestEnv
   semaphore <- IOMVar.newEmptyMVar'
+  let testEnv = testEnv'{logSemaphore = semaphore}
+  serverEnv <- runEff getMasna3Env
+  runEff . Reader.runReader testEnv $ withTestPool cleanUp
   let server = Log.withStdOutLogger $ \logger -> do
         loggingMiddleware <- Log.runLog "masna3-test-server" logger Log.defaultLogLevel WaiLog.mkLogMiddleware
         let warpSettings =
               defaultSettings
-                & setPort (fromIntegral env.httpPort)
+                & setPort (fromIntegral @Word16 @Int testEnv.httpPort)
                 & setBeforeMainLoop (IOMVar.putMVar' semaphore ())
         liftIO
           $ runSettings warpSettings
           $ loggingMiddleware
             . const
-          $ makeServer logger env
-  runEff $ runConcurrent $ withAsync server $ \_ -> do
-    MVar.readMVar' semaphore
-    liftIO $
-      defaultMain $
-        testGroup "Masna3 Tests" tests
+          $ makeServer logger serverEnv
+  runEff $ runConcurrent $ withAsync server $ \_ -> liftIO $ do
+    IOMVar.readMVar' semaphore
+    defaultMain $ testGroup "Masna3 Tests" (specs testEnv)
 
-specs :: [TestEff TestTree]
-specs =
-  [ File.spec
+specs :: TestEnv -> [TestTree]
+specs env =
+  [ File.spec env
   ]
 
 cleanUp :: (IOE :> es, WithConnection :> es) => Eff es ()

@@ -10,8 +10,11 @@ clean: ## Remove compilation artifacts
 repl: ## Start a REPL
 	@cabal repl all
 
-test: ## Run the test suite
-	@cabal test all
+test:  ## Run the test suite
+	./scripts/run-tests.sh
+
+watch-test: ## Load the tests in ghcid and reload them on file change
+	./scripts/run-tests.sh --watch
 
 style: ## Run the code stylers
 	@cd server ; cabal-gild --mode=format --io=masna3.cabal
