@@ -1,8 +1,10 @@
 module Masna3.Server.AWS.URL where
 
+import Amazonka (ToBody (..))
 import Amazonka.Presign
 import Amazonka.S3.GetObject
 import Amazonka.S3.Internal
+import Amazonka.S3.PutObject
 import Data.ByteString
 import Effectful
 import Effectful.Reader.Static (Reader)
@@ -23,10 +25,30 @@ newGetURL bucketName path = do
   pure $
     presignURL
       s3AuthEnv
-      Paris
+      NorthVirginia
       timestamp
       (60 * 5) -- 5 minutes
       ( newGetObject
           bucketName
           (ObjectKey path)
+      )
+
+newPutURL
+  :: ( Reader Masna3Env :> es
+     , Time :> es
+     )
+  => BucketName -> Text -> Text -> Eff es ByteString
+newPutURL bucketName mimetype path = do
+  Masna3Env{s3AuthEnv} <- Reader.ask
+  timestamp <- Time.currentTime
+  pure $
+    presignURL
+      s3AuthEnv
+      NorthVirginia
+      timestamp
+      (60 * 5) -- 5 minutes
+      ( newPutObject
+          bucketName
+          (ObjectKey path)
+          (toBody $ "Content-Type=" <> mimetype)
       )

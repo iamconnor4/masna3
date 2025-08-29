@@ -16,7 +16,7 @@ newtype FileId = FileId UUID
     (Display)
     via ShowInstance UUID
   deriving
-    (Eq, FromField, FromHttpApiData, FromJSON, Ord, Show, ToField, ToJSON)
+    (Eq, FromField, FromHttpApiData, FromJSON, Ord, Show, ToField, ToHttpApiData, ToJSON)
     via UUID
 
 newFileId :: MonadIO m => m FileId

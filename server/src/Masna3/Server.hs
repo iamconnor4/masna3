@@ -1,12 +1,11 @@
 module Masna3.Server where
 
 import Auth.Biscuit.Servant
-import Data.Function ((&))
 import Data.Proxy
 import Effectful
 import Effectful.Error.Static
-import Effectful.Log (Log)
 import Effectful.Log qualified as Log
+import Effectful.Reader.Static qualified as Reader
 import Effectful.Time
 import Log (Logger)
 import Masna3.Api
@@ -18,15 +17,9 @@ import Servant.API (NamedRoutes)
 import Servant.Server
 import Servant.Server.Generic
 
+import Masna3.Server.Effects
 import Masna3.Server.Environment
 import Masna3.Server.File
-
-type RouteEffects =
-  [ Error ServerError
-  , Log
-  , Time
-  , IOE
-  ]
 
 runMasna3
   :: IOE :> es
@@ -52,34 +45,36 @@ makeServer logger environment =
   serveWithContextT
     (Proxy @(NamedRoutes ServerRoutes))
     (genBiscuitCtx environment.publicKey)
-    (handleRoute logger)
+    (handleRoute logger environment)
     masna3Server
 
 handleRoute
   :: Logger
+  -> Masna3Env
   -> Eff RouteEffects a
   -> Handler a
-handleRoute logger action = do
+handleRoute logger env action = do
   err <-
     liftIO $
-      Right <$> action
-        & runErrorNoCallStackWith handleServerError
-        & Log.runLog "masna3-server" logger Log.defaultLogLevel
-        & runTime
-        & runEff
+      Right
+        <$> action
+          & runErrorNoCallStackWith handleServerError
+          & Log.runLog "masna3-server" logger Log.defaultLogLevel
+          & runTime
+          & Reader.runReader env
+          & runEff
   either Servant.throwError pure err
 
 masna3Server :: ServerRoutes (AsServerT (Eff RouteEffects))
 masna3Server =
   ServerRoutes
     { api = apiServer
-    , documentation = undefined
     }
 
 apiServer :: ServerT (NamedRoutes APIRoutes) (Eff RouteEffects)
 apiServer =
   APIRoutes
-    { file = fileServer
+    { files = fileServer
     }
 
 fileServer :: ServerT (NamedRoutes FileRoutes) (Eff RouteEffects)

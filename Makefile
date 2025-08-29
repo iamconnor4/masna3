@@ -10,8 +10,11 @@ clean: ## Remove compilation artifacts
 repl: ## Start a REPL
 	@cabal repl all
 
-test: ## Run the test suite
-	@cabal test all
+test:  ## Run the test suite
+	./scripts/run-tests.sh
+
+watch-test: ## Load the tests in ghcid and reload them on file change
+	./scripts/run-tests.sh --watch
 
 style: ## Run the code stylers
 	@cd server ; cabal-gild --mode=format --io=masna3.cabal
@@ -69,7 +72,7 @@ db-init: ## Create the database schema
 db-migrate: ## Apply database migrations
 	@migrate migrate "$(MASNA3_DB_CONNSTRING)" migrations
 
-db-reset: db-drop db-setup db-provision ## Reset the dev database
+db-reset: db-drop db-setup ## Reset the dev database
 
 help: ## Display this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.* ?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

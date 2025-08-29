@@ -67,6 +67,7 @@ library
     Masna3.Server.AWS.URL
     Masna3.Server.Config
     Masna3.Server.Database
+    Masna3.Server.Effects
     Masna3.Server.Environment
     Masna3.Server.Error
     Masna3.Server.File
@@ -84,6 +85,7 @@ library
     biscuit-haskell,
     biscuit-servant,
     bytestring,
+    containers,
     effectful,
     effectful-core,
     effectful-postgresql,
@@ -101,7 +103,6 @@ library
     servant,
     servant-server,
     text,
-    text-display,
     time,
     uuid-types,
     wai,
@@ -136,6 +137,11 @@ executable masna3-server
     effectful,
     log-base,
     masna3,
+    masna3:masna3-prelude,
+
+  mixins:
+    base hiding (Prelude),
+    masna3:masna3-prelude (Prelude),
 
 test-suite masna3-test
   import: extensions
@@ -146,20 +152,38 @@ test-suite masna3-test
   hs-source-dirs: test
   -- cabal-gild: discover test --exclude "test/Main.hs"
   other-modules:
+    Masna3.Test.File
     Masna3.Test.Utils
 
   build-depends:
     aeson,
     base,
+    binary,
+    bytestring,
+    containers,
+    effectful,
     effectful-core,
     effectful-postgresql,
+    envparse,
+    http-client,
     log-base,
     log-effectful,
     masna3,
+    masna3:masna3-prelude,
     masna3-api,
     monad-time-effectful,
-    postgresql-migration,
     postgresql-simple,
+    sel,
+    servant-client,
+    strict-mutable-base,
     tasty,
     tasty-hunit,
+    text,
+    text-display,
     time,
+    wai-log,
+    warp,
+
+  mixins:
+    base hiding (Prelude),
+    masna3:masna3-prelude (Prelude),

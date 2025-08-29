@@ -1,15 +1,20 @@
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 module Masna3.Server.Model.File.Types
   ( Status (..)
   , File (..)
   , newFile
   ) where
 
+import Amazonka.S3.Internal (BucketName (..))
 import Data.ByteString.Char8 qualified as BS8
 import Data.Time (UTCTime)
 import Database.PostgreSQL.Entity
 import Database.PostgreSQL.Entity.Types
 import Database.PostgreSQL.Simple.FromField
-import Database.PostgreSQL.Simple.FromRow
+import Database.PostgreSQL.Simple.FromRow hiding (field)
 import Database.PostgreSQL.Simple.ToField
 import Database.PostgreSQL.Simple.ToRow
 import Effectful
@@ -30,15 +35,28 @@ data File = File
   , filename :: Text
   , path :: Text
   , status :: Status
-  , bucket :: Text
+  , bucket :: BucketName
   , mimetype :: Text
   , createdAt :: UTCTime
   , updatedAt :: Maybe UTCTime
   }
   deriving stock (Eq, Generic, Ord, Show)
-  deriving
-    (Entity)
-    via (GenericEntity '[TableName "files"] File)
+
+instance Entity File where
+  tableName = "files"
+  primaryKey = [field| file_id |]
+  fields =
+    [ [field| file_id |]
+    , [field| owner_id |]
+    , [field| filename |]
+    , [field| path |]
+    , [field| status |]
+    , [field| bucket |]
+    , [field| mimetype |]
+    , [field| created_at |]
+    , [field| updated_at |]
+    , [field| uploaded_at |]
+    ]
 
 instance ToRow File where
   toRow File{..} =
@@ -57,13 +75,16 @@ instance FromRow File where
       _ -> error $ "Inconsistent status: " <> show (status', uploadedAt)
     pure File{..}
 
+deriving via Text instance FromField BucketName
+deriving via Text instance ToField BucketName
+
 newFile
   :: (IOE :> es, Time :> es)
   => OwnerId
   -- ^ Owner
   -> Text
   -- ^ File name
-  -> Text
+  -> BucketName
   -- ^ Bucket
   -> Text
   -- ^ MIME type
@@ -112,7 +133,7 @@ data File' = File'
   , filename :: Text
   , path :: Text
   , status' :: Status'
-  , bucket :: Text
+  , bucket :: BucketName
   , mimetype :: Text
   , createdAt :: UTCTime
   , updatedAt :: Maybe UTCTime

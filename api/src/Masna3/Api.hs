@@ -7,11 +7,10 @@ import Masna3.Api.File
 
 data ServerRoutes mode = ServerRoutes
   { api :: mode :- "api" :> NamedRoutes APIRoutes
-  , documentation :: mode :- "documentation" :> Raw
   }
   deriving (Generic)
 
 data APIRoutes mode = APIRoutes
-  { file :: mode :- "file" :> NamedRoutes FileRoutes
+  { files :: mode :- "files" :> NamedRoutes FileRoutes
   }
   deriving (Generic)

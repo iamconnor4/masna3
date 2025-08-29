@@ -13,17 +13,21 @@ module Prelude
   , module Data.Ord
   , module Data.Eq
   , module Data.Monoid
+  , module Control.Monad.IO.Class
   , List
   , Text
   , Vector
   , identity
+  , (&)
   ) where
 
 import Control.Applicative
 import Control.Monad
+import Control.Monad.IO.Class
 import Data.Either
 import Data.Eq
 import Data.Foldable
+import Data.Function ((&))
 import Data.Functor
 import Data.List (List)
 import Data.Maybe
