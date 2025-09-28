@@ -3,6 +3,7 @@ module Masna3.Server.File where
 import Data.Text.Encoding qualified as Text
 import Effectful
 import Effectful.Reader.Static qualified as Reader
+import Effectful.Time qualified as Time
 import Masna3.Api.File
 import Masna3.Api.File.FileId
 import Servant.API.ContentTypes
@@ -33,8 +34,11 @@ registerHandler form = do
   withPool (Update.insertFile file)
   pure FileRegistrationResult{fileId = file.fileId, url}
 
-confirmHandler :: FileId -> UploadConfirmationForm -> Eff es NoContent
-confirmHandler _ _ = pure NoContent
+confirmHandler :: FileId -> Eff RouteEffects NoContent
+confirmHandler fileId = do
+  timestamp <- Time.currentTime
+  withPool (Update.confirmFile fileId timestamp)
+  pure NoContent
 
 cancelHandler :: FileId -> UploadCancellationForm -> Eff es NoContent
 cancelHandler _ _ = pure NoContent
