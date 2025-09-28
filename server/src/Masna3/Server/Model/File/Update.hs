@@ -20,6 +20,6 @@ confirmFile fileId timestamp = void $ execute q (timestamp, fileId)
   where
     q =
       [sql|
-        UPDATE files SET (status = "uploaded", uploaded_at = ?)
+        UPDATE files SET status = 'uploaded', uploaded_at = ?
         WHERE file_id = ?; 
        |]

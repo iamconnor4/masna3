@@ -13,6 +13,7 @@ spec env =
   testGroup
     "File tests"
     [ testThis env "Register file" testRegisterFile
+    , testThis env "Confirm File" testConfirmFile
     ]
 
 testRegisterFile :: TestEff ()
@@ -23,3 +24,13 @@ testRegisterFile = do
       mimeType = "text/plain"
   let form = FileRegistrationForm fileName owner.ownerId mimeType
   void $ assertRight "Register file" =<< runRequest (Client.registerFile form)
+
+testConfirmFile :: TestEff ()
+testConfirmFile = do
+  owner <- newOwner "test-client-2"
+  withTestPool $ Update.insertOwner owner
+  let fileName = "toto.txt"
+      mimeType = "text/plain"
+  let form = FileRegistrationForm fileName owner.ownerId mimeType
+  result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
+  void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
