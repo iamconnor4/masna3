@@ -9,7 +9,6 @@ import Servant.Client
 
 import Masna3.Api
 import Masna3.Api.File
-
 import Masna3.Api.File.FileId
 
 masna3Client :: ServerRoutes (AsClientT ClientM)
@@ -26,7 +25,7 @@ registerFile form =
 confirmFile :: FileId -> ClientM NoContent
 confirmFile fileId =
   masna3Client
-  // (.api)
-  // (.files)
-  // (.confirm)
-  /: fileId
+    // (.api)
+    // (.files)
+    // (.confirm)
+    /: fileId
