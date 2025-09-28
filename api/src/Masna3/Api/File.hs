@@ -23,12 +23,6 @@ data FileRegistrationResult = FileRegistrationResult
   deriving stock (Eq, Generic, Ord, Show)
   deriving anyclass (FromJSON, ToJSON)
 
-data UploadConfirmationForm = UploadConfirmationForm
-  { fileId :: FileId
-  }
-  deriving stock (Eq, Generic, Ord, Show)
-  deriving anyclass (FromJSON, ToJSON)
-
 data UploadCancellationForm = UploadCancellationForm
   { fileId :: FileId
   }
@@ -44,7 +38,6 @@ type RegisterFile =
 type ConfirmFileUpload =
   Summary "Register a file for upload"
     :> Capture "file_id" FileId
-    :> ReqBody '[JSON] UploadConfirmationForm
     :> Post '[JSON] NoContent
 
 type CancelFileUpload =
