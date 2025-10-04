@@ -7,7 +7,6 @@ import Auth.Biscuit.Utils
 import Data.Bifunctor
 import Data.ByteString
 import Data.ByteString.Char8 qualified as BS8
-import Data.IntMap.Strict (IntMap)
 import Data.Pool
 import Data.Text qualified as Text
 import Data.Time
@@ -17,7 +16,6 @@ import Database.PostgreSQL.Simple qualified as PG
 import Effectful.Concurrent.MVar.Strict (MVar')
 import Env
 import GHC.Generics
-import Log.Backend.LogList (LogList)
 import Network.Socket (HostName, PortNumber)
 import Text.Read (readMaybe)
 

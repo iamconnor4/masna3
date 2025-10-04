@@ -1,9 +1,11 @@
 module Masna3.Server where
 
 import Auth.Biscuit.Servant
+import Data.ByteString.Lazy qualified as BSL
 import Data.Proxy
 import Effectful
 import Effectful.Error.Static
+import Effectful.Log (Log, (.=))
 import Effectful.Log qualified as Log
 import Effectful.Reader.Static qualified as Reader
 import Effectful.Time
@@ -19,6 +21,7 @@ import Servant.Server.Generic
 
 import Masna3.Server.Effects
 import Masna3.Server.Environment
+import Masna3.Server.Error
 import Masna3.Server.File
 
 runMasna3
@@ -58,7 +61,7 @@ handleRoute logger env action = do
     liftIO $
       Right
         <$> action
-          & runErrorNoCallStackWith handleServerError
+          & runErrorNoCallStackWith handleMasna3Error
           & Log.runLog "masna3-server" logger Log.defaultLogLevel
           & runTime
           & Reader.runReader env
@@ -85,5 +88,12 @@ fileServer =
     , cancel = cancelHandler
     }
 
-handleServerError :: ServerError -> Eff es (Either ServerError a)
-handleServerError = pure . Left
+handleMasna3Error :: Log :> es => Masna3Error -> Eff es (Either ServerError a)
+handleMasna3Error masna3Error = do
+  let servantError = toServerError masna3Error
+  Log.logInfo "Server error" $
+    Log.object
+      [ "error_body" .= BSL.unpack (errBody servantError)
+      , "error_code" .= errHTTPCode servantError
+      ]
+  pure $ Left servantError

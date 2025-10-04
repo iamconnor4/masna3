@@ -79,6 +79,7 @@ library
     Masna3.Server.Model.Owner.Update
 
   build-depends:
+    aeson,
     amazonka,
     amazonka-s3,
     base >=4.20 && <4.21,
