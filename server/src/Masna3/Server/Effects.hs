@@ -5,12 +5,12 @@ import Effectful.Error.Static (Error)
 import Effectful.Log (Log)
 import Effectful.Reader.Static (Reader)
 import Effectful.Time (Time)
-import Servant.Server
 
 import Masna3.Server.Environment
+import Masna3.Server.Error
 
 type RouteEffects =
-  [ Error ServerError
+  [ Error Masna3Error
   , Log
   , Time
   , Reader Masna3Env
