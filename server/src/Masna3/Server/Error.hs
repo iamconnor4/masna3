@@ -23,7 +23,7 @@ toServerError = \case
       { errBody =
           encode
             ErrorResponse
-              { error = "TooManyRows"
+              { errorType = "TooManyRows"
               , context = Just $ object ["ownerId" .= t]
               }
       }
@@ -32,7 +32,7 @@ toServerError = \case
       { errBody =
           encode
             ErrorResponse
-              { error = "FileNotFound"
+              { errorType = "FileNotFound"
               , context = Just $ object ["fileId" .= t]
               }
       }
@@ -41,13 +41,13 @@ toServerError = \case
       { errBody =
           encode
             ErrorResponse
-              { error = "InvalidTransition NotPendingToUploaded"
+              { errorType = "InvalidTransition NotPendingToUploaded"
               , context = Just $ object ["fileId" .= t]
               }
       }
 
 data ErrorResponse = ErrorResponse
-  { error :: Text
+  { errorType :: Text
   , context :: Maybe Value
   }
   deriving stock (Generic)
