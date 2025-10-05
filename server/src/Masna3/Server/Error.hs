@@ -3,7 +3,7 @@ module Masna3.Server.Error where
 import Data.Aeson
 import GHC.Generics (Generic)
 import Masna3.Api.File.FileId
-import Servant (ServerError (..), err500)
+import Servant (ServerError (..), err500, err404)
 
 data Masna3Error
   = TooManyRows Text
@@ -28,7 +28,7 @@ toServerError = \case
               }
       }
   FileNotFound t ->
-    err500
+    err404
       { errBody =
           encode
             ErrorResponse
