@@ -1,8 +1,10 @@
 module Masna3.Server.File where
 
+import Data.Aeson
 import Data.Text.Encoding qualified as Text
 import Effectful
 import Effectful.Error.Static qualified as Error
+import Effectful.Log qualified as Log
 import Effectful.Reader.Static qualified as Reader
 import Effectful.Time qualified as Time
 import Masna3.Api.File
@@ -45,13 +47,17 @@ confirmHandler fileId = do
       timestamp <- Time.currentTime
       withPool (Update.confirmFile fileId timestamp)
       pure NoContent
-    _ -> Error.throwError (InvalidTransition (NotPendingToUploaded fileId))
+    _ ->
+      Log.localData ["file_id" .= fileId] $
+        Error.throwError (InvalidTransition (NotPendingToUploaded fileId))
 
 guardThatFileExists :: FileId -> Eff RouteEffects File
 guardThatFileExists fileId = do
   maybeFile <- withPool (Query.getFileById fileId)
   case maybeFile of
-    Nothing -> Error.throwError (FileNotFound fileId)
+    Nothing ->
+      Log.localData ["file_id" .= fileId] $
+        Error.throwError (FileNotFound fileId)
     Just file -> pure file
 
 cancelHandler :: FileId -> UploadCancellationForm -> Eff es NoContent

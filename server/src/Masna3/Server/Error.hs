@@ -1,9 +1,8 @@
 module Masna3.Server.Error where
 
 import Data.Aeson
-import GHC.Generics (Generic)
 import Masna3.Api.File.FileId
-import Servant (ServerError (..), err500, err404)
+import Servant (ServerError (..), err404, err500)
 
 data Masna3Error
   = TooManyRows Text
@@ -13,42 +12,10 @@ data Masna3Error
 
 data InvalidTransitionError
   = NotPendingToUploaded FileId
-  deriving stock (Eq, Generic, Ord, Show)
-  deriving anyclass (ToJSON)
+  deriving stock (Eq, Ord, Show)
 
 toServerError :: Masna3Error -> ServerError
 toServerError = \case
-  TooManyRows t ->
-    err500
-      { errBody =
-          encode
-            ErrorResponse
-              { errorType = "TooManyRows"
-              , context = Just $ object ["ownerId" .= t]
-              }
-      }
-  FileNotFound t ->
-    err404
-      { errBody =
-          encode
-            ErrorResponse
-              { errorType = "FileNotFound"
-              , context = Just $ object ["fileId" .= t]
-              }
-      }
-  InvalidTransition (NotPendingToUploaded t) ->
-    err500
-      { errBody =
-          encode
-            ErrorResponse
-              { errorType = "InvalidTransition NotPendingToUploaded"
-              , context = Just $ object ["fileId" .= t]
-              }
-      }
-
-data ErrorResponse = ErrorResponse
-  { errorType :: Text
-  , context :: Maybe Value
-  }
-  deriving stock (Generic)
-  deriving anyclass (ToJSON)
+  TooManyRows t -> err500{errBody = encode t}
+  FileNotFound _ -> err404
+  InvalidTransition (NotPendingToUploaded t) -> err500{errBody = encode t}
