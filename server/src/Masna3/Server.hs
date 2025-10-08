@@ -1,7 +1,7 @@
 module Masna3.Server where
 
 import Auth.Biscuit.Servant
-import Data.ByteString.Lazy qualified as BSL
+import Data.Aeson (encode)
 import Data.Proxy
 import Effectful
 import Effectful.Error.Static
@@ -90,10 +90,12 @@ fileServer =
 
 handleMasna3Error :: Log :> es => Masna3Error -> Eff es (Either ServerError a)
 handleMasna3Error masna3Error = do
-  let servantError = toServerError masna3Error
+  let servantError =
+        let err = toServerError masna3Error
+         in err{errBody = encode masna3Error}
   Log.logInfo "Server error" $
     Log.object
-      [ "error_body" .= BSL.unpack (errBody servantError)
+      [ "error_body" .= masna3Error
       , "error_code" .= errHTTPCode servantError
       ]
   pure $ Left servantError

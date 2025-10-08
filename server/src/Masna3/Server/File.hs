@@ -15,7 +15,7 @@ import Masna3.Server.AWS.URL
 import Masna3.Server.Database
 import Masna3.Server.Effects
 import Masna3.Server.Environment
-import Masna3.Server.Error (InvalidTransitionError (NotPendingToUploaded), Masna3Error (FileNotFound, InvalidTransition))
+import Masna3.Server.Error (FileNotFound (..), InvalidTransitionError (..), Masna3Error (..), MkInvalidTransitionFile (..))
 import Masna3.Server.Model.File.Query qualified as Query
 import Masna3.Server.Model.File.Types
 import Masna3.Server.Model.File.Update qualified as Update
@@ -49,7 +49,7 @@ confirmHandler fileId = do
       pure NoContent
     _ ->
       Log.localData ["file_id" .= fileId] $
-        Error.throwError (InvalidTransition (NotPendingToUploaded fileId))
+        Error.throwError (InvalidTransition (NotPendingToUploaded (MkInvalidTransitionFile fileId)))
 
 guardThatFileExists :: FileId -> Eff RouteEffects File
 guardThatFileExists fileId = do
@@ -57,7 +57,7 @@ guardThatFileExists fileId = do
   case maybeFile of
     Nothing ->
       Log.localData ["file_id" .= fileId] $
-        Error.throwError (FileNotFound fileId)
+        Error.throwError (FileNotFoundError (FileNotFound fileId))
     Just file -> pure file
 
 cancelHandler :: FileId -> UploadCancellationForm -> Eff es NoContent
