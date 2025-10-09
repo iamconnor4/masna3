@@ -167,6 +167,7 @@ test-suite masna3-test
     effectful-postgresql,
     envparse,
     http-client,
+    http-types,
     log-base,
     log-effectful,
     masna3,

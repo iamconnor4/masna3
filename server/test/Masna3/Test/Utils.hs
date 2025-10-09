@@ -7,6 +7,8 @@ module Masna3.Test.Utils
   , assertBool
   , assertJust
   , assertRight
+  , assertLeft
+  , assertLeftWithStatus
   , runRequest
   , getTestEnv
   ) where
@@ -32,6 +34,7 @@ import Env qualified
 import GHC.Stack
 import Log.Backend.LogList qualified as Log
 import Network.HTTP.Client (defaultManagerSettings, newManager)
+import Network.HTTP.Types (statusCode)
 import Servant.Client
 import Test.Tasty (TestTree)
 import Test.Tasty.HUnit qualified as Test
@@ -98,6 +101,32 @@ assertJust message Nothing = liftIO $ Test.assertFailure message
 assertRight :: HasCallStack => String -> Either a b -> TestEff b
 assertRight _ (Right b) = pure b
 assertRight message (Left _a) = liftIO $ Test.assertFailure message
+
+assertLeft :: HasCallStack => String -> Either a b -> TestEff a
+assertLeft description (Right _b) = liftIO $ Test.assertFailure description
+assertLeft _ (Left a) = pure a
+
+assertLeftWithStatus :: HasCallStack => String -> Int -> Either ClientError a -> TestEff ()
+assertLeftWithStatus description expectedCode requestResult = do
+  clientError <- assertLeft description requestResult
+  case clientError of
+    FailureResponse _ resp -> compareStatusCodes resp
+    InvalidContentTypeHeader resp -> compareStatusCodes resp
+    DecodeFailure _ resp -> compareStatusCodes resp
+    UnsupportedContentType _ resp -> compareStatusCodes resp
+    ConnectionError _ -> liftIO $ Test.assertFailure $ description <> ". Expected status " <> show expectedCode <> ". Connection error."
+  where
+    compareStatusCodes :: Response -> TestEff ()
+    compareStatusCodes response
+      | statusCode (responseStatusCode response) == expectedCode = pure ()
+      | otherwise =
+          liftIO $
+            Test.assertFailure $
+              description
+                <> ". Expected status "
+                <> show expectedCode
+                <> " but received "
+                <> show ((response.responseStatusCode).statusCode)
 
 runRequest :: ClientM a -> TestEff (Either ClientError a)
 runRequest request = do
