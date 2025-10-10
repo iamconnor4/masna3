@@ -14,6 +14,7 @@ spec env =
     "File tests"
     [ testThis env "Register file" testRegisterFile
     , testThis env "Confirm File" testConfirmFile
+    , testThis env "Confirm File Invalid Transition" testConfirmFileInvalidTransition
     ]
 
 testRegisterFile :: TestEff ()
@@ -34,3 +35,14 @@ testConfirmFile = do
   let form = FileRegistrationForm fileName owner.ownerId mimeType
   result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
   void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
+
+testConfirmFileInvalidTransition :: TestEff ()
+testConfirmFileInvalidTransition = do
+  owner <- newOwner "test-client-3"
+  withTestPool $ Update.insertOwner owner
+  let fileName = "toto.txt"
+      mimeType = "text/plain"
+  let form = FileRegistrationForm fileName owner.ownerId mimeType
+  result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
+  void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
+  void $ assertLeftWithStatus "Confirm File" 500 =<< runRequest (Client.confirmFile result.fileId)
