@@ -87,6 +87,7 @@ library
     biscuit-servant,
     bytestring,
     containers,
+    deriving-aeson,
     effectful,
     effectful-core,
     effectful-postgresql,
