@@ -16,6 +16,8 @@ jobs:
         pattern: |
           api/**/*.hs
           server/**/*.hs
+          masna3-jobs/**/*.hs
+          masna3-prelude/**/*.hs
 
   hlint:
     runs-on: ubuntu-latest
@@ -25,10 +27,10 @@ jobs:
     - name: 'Set up HLint'
       uses: haskell-actions/hlint-setup@v2
       with:
-        version: '3.8'
+        version: '3.10'
 
     - name: 'Run HLint'
       uses: haskell-actions/hlint-run@v2
       with:
-        path: '["server/", "api/"]'
+        path: '["server/", "api/", "masna3-prelude", "masna3-jobs"]'
         fail-on: warning

@@ -19,16 +19,20 @@ watch-test: ## Load the tests in ghcid and reload them on file change
 style: ## Run the code stylers
 	@cd server ; cabal-gild --mode=format --io=masna3.cabal
 	@cd api ; cabal-gild --mode=format --io=masna3-api.cabal
+	@cd masna3-prelude ; cabal-gild --mode=format --io=masna3-prelude.cabal
+	@cd masna3-jobs ; cabal-gild --mode=format --io=masna3-jobs.cabal
 	@cabal-gild --mode=format --io=cabal.project
-	@fourmolu -q --mode inplace server api
-	@find server api -name "*.hs" | xargs -P $(PROCS) -I {} hlint --refactor-options="-i" --refactor {}
+	@fourmolu -q --mode inplace server api masna3-jobs masna3-prelude
+	@find server api masna3-jobs masna3-prelude -name "*.hs" | xargs -P $(PROCS) -I {} hlint --refactor-options="-i" --refactor {}
 
 style-quick: ## Run the code stylers are changed files
 	@cd server ; cabal-gild --mode=format --io=masna3.cabal
 	@cd api ; cabal-gild --mode=format --io=masna3-api.cabal
+	@cd masna3-prelude ; cabal-gild --mode=format --io=masna3-prelude.cabal
+	@cd masna3-jobs ; cabal-gild --mode=format --io=masna3-jobs.cabal
 	@cabal-gild --mode=format --io=cabal.project
-	@git diff origin --name-only api server | xargs -P $(PROCS) -I {} fourmolu -q -i {}
-	@git diff origin --name-only api server | xargs -P $(PROCS) -I {} hlint --refactor-options="-i" --refactor {}
+	@git diff origin --name-only api server masna3-jobs masna3-prelude | xargs -P $(PROCS) -I {} fourmolu -q -i {}
+	@git diff origin --name-only api server masna3-jobs masna3-prelude | xargs -P $(PROCS) -I {} hlint --refactor-options="-i" --refactor {}
 
 tags: ## Generate ctags for the project with `ghc-tags`
 	@ghc-tags -c api server
