@@ -23,9 +23,9 @@ data WorkerConfig m payload = WorkerConfig
 
 runWorker :: (FromJSON payload, Log :> es) => WorkerConfig (Eff es) payload -> Job -> Eff es ()
 runWorker config job = Log.localData ["job_id" .= job.id, "queue" .= config.queueName] $ do
-  case eitherDecodeStrictText job.message of
-    Right payload -> do
+  case fromJSON job.message of
+    Success payload -> do
       withException (config.process payload) (config.onException job)
-    Left errorString -> do
+    Error errorString -> do
       Log.logAttention "Could not decode job payload" $
         object ["error" .= errorString]

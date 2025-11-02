@@ -62,9 +62,11 @@ common rts-options
 library
   import: extensions
   import: ghc-options
+  hs-source-dirs: src
   -- cabal-gild: discover src
   exposed-modules:
     Masna3.Jobs.Job
+    Masna3.Jobs.Queue
     Masna3.Jobs.Worker
 
   build-depends:
@@ -95,4 +97,46 @@ library
     base hiding (Prelude),
     masna3-prelude (Prelude),
 
-  hs-source-dirs: src
+test-suite masna3-jobs-test
+  import: extensions
+  import: ghc-options
+  import: rts-options
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  hs-source-dirs: test
+  -- cabal-gild: discover test --exclude "test/Main.hs"
+  other-modules: Masna3.Jobs.Test.Utils
+  build-depends:
+    aeson,
+    base,
+    binary,
+    bytestring,
+    containers,
+    deriving-aeson,
+    effectful,
+    effectful-core,
+    effectful-postgresql,
+    envparse,
+    http-client,
+    http-types,
+    log-base,
+    log-effectful,
+    masna3-jobs,
+    masna3-prelude,
+    monad-time-effectful,
+    postgresql-simple,
+    resource-pool,
+    sel,
+    servant-client,
+    strict-mutable-base,
+    tasty,
+    tasty-hunit,
+    text,
+    text-display,
+    time,
+    wai-log,
+    warp,
+
+  mixins:
+    base hiding (Prelude),
+    masna3-prelude (Prelude),
