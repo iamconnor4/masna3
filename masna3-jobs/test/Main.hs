@@ -1,5 +1,6 @@
 module Main where
 
+import Data.Aeson
 import Data.ByteString
 import Data.ByteString.Char8 qualified as C8
 import Data.Pool (Pool)
@@ -8,8 +9,12 @@ import Database.PostgreSQL.Simple qualified as PG
 import Database.PostgreSQL.Simple.FromField
 import Database.PostgreSQL.Simple.Newtypes
 import Database.PostgreSQL.Simple.ToField
+import Database.PostgreSQL.Simple.Types
 import Deriving.Aeson
 import Effectful
+import Effectful.PostgreSQL (WithConnection)
+import Effectful.PostgreSQL qualified as DB
+import Effectful.Reader.Static qualified as Reader
 import System.Environment
 import System.Exit
 import Test.Tasty
@@ -21,6 +26,7 @@ import Masna3.Jobs.Test.Utils
 
 data JobPayload
   = PrintMessage Text
+  | PurgeOrphanFiles
   deriving stock (Eq, Generic, Ord, Show)
   deriving
     (FromJSON, ToJSON)
@@ -55,6 +61,7 @@ main = do
 
   pool <- runEff $ mkPool connString
   let env = TestEnv pool
+  runEff . Reader.runReader env $ withTestPool cleanUpQueues
   defaultMain $ testGroup "masna3-jobs tests" (specs env)
 
 specs :: TestEnv -> [TestTree]
@@ -67,9 +74,19 @@ specs env =
 
 testCreateNewJob :: TestEff ()
 testCreateNewJob = do
-  withTestPool $ do
-    Queue.createQueue "testQueue"
-    liftIO $ print "Created testQueue"
-    Job.insertJob "testQueue" (PrintMessage "hello")
-    job <- Job.readJob "testQueue"
-    liftIO $ print job
+  mJob <- withTestPool $ do
+    Queue.createQueue "testqueue"
+    Job.insertJob "testQueue" (PrintMessage "salam")
+    Job.readJob "testQueue"
+
+  job <- assertJust "Get a job from the queue" mJob
+  result :: JobPayload <- assertSuccess "Payload decoded" (fromJSON job.message)
+  assertEqual
+    "Message payload is correct"
+    result
+    (PrintMessage "salam")
+
+cleanUpQueues :: (IOE :> es, WithConnection :> es) => Eff es ()
+cleanUpQueues = do
+  _ :: [Only Int] <- DB.query_ "select * from pgmq.purge_queue('testqueue')"
+  pure ()

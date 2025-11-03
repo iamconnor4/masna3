@@ -30,14 +30,14 @@ data Job = Job
   deriving anyclass (FromRow)
 
 insertJob
-  :: (IOE :> es, WithConnection :> es, ToField payload)
+  :: (IOE :> es, ToJSON payload, WithConnection :> es)
   => Text
   -- ^ Queue name
   -> payload
   -- ^ Job payload
   -> Eff es ()
 insertJob queueName payload = do
-  _ :: [Only Int] <- DB.query q (queueName, payload)
+  _ :: [Only Int] <- DB.query q (queueName, Aeson payload)
   pure ()
   where
     q =
