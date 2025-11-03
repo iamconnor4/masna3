@@ -32,5 +32,5 @@ jobs:
     - name: 'Run HLint'
       uses: haskell-actions/hlint-run@v2
       with:
-        path: '["server/", "api/", "masna3-prelude", "masna3-jobs"]'
+        path: '["server/", "api/", "masna3-prelude/", "masna3-jobs/"]'
         fail-on: warning
