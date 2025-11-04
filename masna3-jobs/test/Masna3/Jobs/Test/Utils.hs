@@ -49,18 +49,18 @@ withTestPool action = do
   DB.runWithConnectionPool pool $ do
     DB.withTransaction action
 
-assertEqual :: (Eq a, HasCallStack, Show a) => String -> a -> a -> TestEff ()
+assertEqual :: (Eq a, HasCallStack, IOE :> es, Show a) => String -> a -> a -> Eff es ()
 assertEqual message expected actual = liftIO $ Test.assertEqual message expected actual
 
-assertJust :: HasCallStack => String -> Maybe a -> TestEff a
+assertJust :: (HasCallStack, IOE :> es) => String -> Maybe a -> Eff es a
 assertJust _ (Just a) = pure a
 assertJust message Nothing = liftIO $ Test.assertFailure message
 
-assertRight :: HasCallStack => String -> Either a b -> TestEff b
+assertRight :: (HasCallStack, IOE :> es) => String -> Either a b -> Eff es b
 assertRight _ (Right b) = pure b
 assertRight message (Left _a) = liftIO $ Test.assertFailure message
 
-assertSuccess :: HasCallStack => String -> Result b -> TestEff b
+assertSuccess :: (HasCallStack, IOE :> es) => String -> Result b -> Eff es b
 assertSuccess message result = assertRight message (toEither result)
   where
     toEither (Error m) = Left m

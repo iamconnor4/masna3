@@ -21,6 +21,7 @@ import Test.Tasty
 
 import Masna3.Jobs.Job (Job (..))
 import Masna3.Jobs.Job qualified as Job
+import Masna3.Jobs.Poller qualified as Poller
 import Masna3.Jobs.Queue qualified as Queue
 import Masna3.Jobs.Test.Utils
 
@@ -74,17 +75,17 @@ specs env =
 
 testCreateNewJob :: TestEff ()
 testCreateNewJob = do
-  mJob <- withTestPool $ do
+  let pollerConfig = Poller.mkPollerConfig "testqueue"
+  withTestPool $ do
     Queue.createQueue "testqueue"
     Job.insertJob "testQueue" (PrintMessage "salam")
-    Job.readJob "testQueue"
 
-  job <- assertJust "Get a job from the queue" mJob
-  result :: JobPayload <- assertSuccess "Payload decoded" (fromJSON job.message)
-  assertEqual
-    "Message payload is correct"
-    result
-    (PrintMessage "salam")
+  withTestPool $ Poller.monitorQueue pollerConfig $ \job -> do
+    result :: JobPayload <- assertSuccess "Payload decoded" (fromJSON job.message)
+    assertEqual
+      "Message payload is correct"
+      result
+      (PrintMessage "salam")
 
 cleanUpQueues :: (IOE :> es, WithConnection :> es) => Eff es ()
 cleanUpQueues = do
