@@ -5,7 +5,7 @@ synopsis: File Storage Proxy
 license: LGPL-3.0-only
 license-file: ../LICENSE
 author: Théophile Choutri de Tarlé
-maintainer: The Masna3 Contributors
+maintainer: The Masna Contributors
 build-type: Simple
 extra-doc-files: ../CHANGELOG.md
 tested-with: ghc ==9.10.2
