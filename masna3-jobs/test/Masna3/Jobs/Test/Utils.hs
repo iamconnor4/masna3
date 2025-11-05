@@ -5,6 +5,8 @@ import Data.Pool (Pool)
 import Data.Text qualified as Text
 import Database.PostgreSQL.Simple qualified as PG
 import Effectful
+import Effectful.Concurrent
+import Effectful.Concurrent qualified as Concurrent
 import Effectful.Log (Log)
 import Effectful.Log qualified as Log
 import Effectful.PostgreSQL (WithConnection)
@@ -18,14 +20,16 @@ import Log.Backend.StandardOutput qualified as Log
 import Test.Tasty (TestTree)
 import Test.Tasty.HUnit qualified as Test
 
-type TestEff a =
+type TestM a = TestEff a
+
+type TestEff =
   Eff
     '[ Time
      , Reader TestEnv
      , Log
+     , Concurrent
      , IOE
      ]
-    a
 
 data TestEnv = TestEnv
   { pool :: Pool PG.Connection
@@ -39,6 +43,7 @@ testThis env name assertion = Test.testCase (Text.unpack name) $ do
         & Time.runTime
         & Reader.runReader env
         & Log.runLog "masna3-jobs-test" logger Log.defaultLogLevel
+        & Concurrent.runConcurrent
 
 withTestPool
   :: forall a es

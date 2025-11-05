@@ -6,6 +6,7 @@ module Masna3.Jobs.Worker
 import Control.Exception
 import Data.Aeson
 import Effectful
+import Effectful.Concurrent
 import Effectful.Exception
 import Effectful.Log
 import Log.Class qualified as Log
@@ -21,8 +22,20 @@ data WorkerConfig m payload = WorkerConfig
   -- ^ How to process the job payload
   }
 
-runWorker :: (FromJSON payload, Log :> es) => WorkerConfig (Eff es) payload -> Job -> Eff es ()
-runWorker config job = Log.localData ["job_id" .= job.id, "queue" .= config.queueName] $ do
+runWorker
+  :: (Concurrent :> es, FromJSON payload, Log :> es)
+  => WorkerConfig (Eff es) payload
+  -> Job
+  -> Eff es ()
+runWorker config job = do
+  threadId <- myThreadId
+  Log.logInfo "Running job worker" $
+    object
+      [ "job_id" .= job.id
+      , "job_message" .= job.message
+      , "queue_name" .= config.queueName
+      , "thread_id" .= show threadId
+      ]
   case fromJSON job.message of
     Success payload -> do
       withException (config.process payload) (config.onException job)

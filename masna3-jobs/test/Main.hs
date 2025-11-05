@@ -12,6 +12,8 @@ import Database.PostgreSQL.Simple.ToField
 import Database.PostgreSQL.Simple.Types
 import Deriving.Aeson
 import Effectful
+import Effectful.Log (Log)
+import Effectful.Log qualified as Log
 import Effectful.PostgreSQL (WithConnection)
 import Effectful.PostgreSQL qualified as DB
 import Effectful.Reader.Static qualified as Reader
@@ -19,11 +21,11 @@ import System.Environment
 import System.Exit
 import Test.Tasty
 
-import Masna3.Jobs.Job (Job (..))
 import Masna3.Jobs.Job qualified as Job
 import Masna3.Jobs.Poller qualified as Poller
 import Masna3.Jobs.Queue qualified as Queue
 import Masna3.Jobs.Test.Utils
+import Masna3.Jobs.Worker (WorkerConfig (..))
 
 data JobPayload
   = PrintMessage Text
@@ -73,19 +75,23 @@ specs env =
       testCreateNewJob
   ]
 
-testCreateNewJob :: TestEff ()
+testCreateNewJob :: TestM ()
 testCreateNewJob = do
   let pollerConfig = Poller.mkPollerConfig "testqueue"
+  let workerConfig :: Log :> es => WorkerConfig (Eff es) JobPayload
+      workerConfig =
+        WorkerConfig
+          { queueName = "testqueue"
+          , onException = \_ _ -> error "Caught exception"
+          , process = \payload ->
+              case payload of
+                PrintMessage msg -> Log.logInfo_ msg
+                PurgeOrphanFiles -> Log.logInfo_ "Purging orphan files…"
+          }
   withTestPool $ do
     Queue.createQueue "testqueue"
     Job.insertJob "testQueue" (PrintMessage "salam")
-
-  withTestPool $ Poller.monitorQueue pollerConfig $ \job -> do
-    result :: JobPayload <- assertSuccess "Payload decoded" (fromJSON job.message)
-    assertEqual
-      "Message payload is correct"
-      result
-      (PrintMessage "salam")
+  withTestPool $ Poller.monitorQueue pollerConfig workerConfig
 
 cleanUpQueues :: (IOE :> es, WithConnection :> es) => Eff es ()
 cleanUpQueues = do

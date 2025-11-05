@@ -88,6 +88,7 @@ library
     pg-entity,
     poolboy,
     postgresql-simple,
+    prometheus-client,
     resource-pool,
     servant,
     servant-server,
