@@ -86,6 +86,7 @@ fileServer =
     { register = registerHandler
     , confirm = confirmHandler
     , cancel = cancelHandler
+    , delete = deleteHandler
     }
 
 handleMasna3Error :: Log :> es => Masna3Error -> Eff es (Either ServerError a)
