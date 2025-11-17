@@ -71,6 +71,7 @@ library
     Masna3.Server.Environment
     Masna3.Server.Error
     Masna3.Server.File
+    Masna3.Server.Jobs.Types
     Masna3.Server.Model.File.Query
     Masna3.Server.Model.File.Types
     Masna3.Server.Model.File.Update
@@ -124,11 +125,16 @@ executable masna3-server
   main-is: Main.hs
   hs-source-dirs: app
   build-depends:
+    aeson,
+    background-jobs,
     base,
     effectful,
+    effectful-postgresql,
     log-base,
+    log-effectful,
     masna3,
     masna3-prelude,
+    monad-time-effectful,
 
   mixins:
     base hiding (Prelude),

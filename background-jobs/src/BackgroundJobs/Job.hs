@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE QuasiQuotes #-}
 
-module Masna3.Jobs.Job where
+module BackgroundJobs.Job where
 
 import Data.Aeson
 import Data.List qualified as List

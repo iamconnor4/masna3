@@ -1,4 +1,4 @@
-module Masna3.Jobs.Test.Utils where
+module BackgroundJobs.Test.Utils where
 
 import Data.Aeson
 import Data.Pool (Pool)
@@ -42,7 +42,7 @@ testThis env name assertion = Test.testCase (Text.unpack name) $ do
       assertion
         & Time.runTime
         & Reader.runReader env
-        & Log.runLog "masna3-jobs-test" logger Log.defaultLogLevel
+        & Log.runLog "background-jobs-test" logger Log.defaultLogLevel
         & Concurrent.runConcurrent
 
 withTestPool

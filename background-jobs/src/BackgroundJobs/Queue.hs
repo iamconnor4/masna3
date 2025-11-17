@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE QuasiQuotes #-}
 
-module Masna3.Jobs.Queue where
+module BackgroundJobs.Queue where
 
 import Data.Aeson
 import Data.Time (UTCTime)

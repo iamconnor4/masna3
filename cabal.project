@@ -2,7 +2,7 @@ packages:
   ./server
   ./api
   ./masna3-prelude
-  ./masna3-jobs
+  ./background-jobs
 
 with-compiler: ghc-9.10.2
 with-hc-pkg: ghc-pkg-9.10.2

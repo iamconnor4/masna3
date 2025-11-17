@@ -104,6 +104,6 @@ jobs:
         createdb -h "${MASNA3_DB_HOST}" -p "${MASNA3_DB_PORT}" -U "${MASNA3_DB_USER}" -w "${MASNA3_DB_DATABASE}"
         migrate init "${MASNA3_DB_CONNSTRING}"
         migrate migrate "${MASNA3_DB_CONNSTRING}" migrations
-        cabal test masna3-jobs-test
+        cabal test background-jobs-test
       env:
         PGPASSWORD: "postgres"

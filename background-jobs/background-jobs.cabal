@@ -1,5 +1,5 @@
 cabal-version: 3.12
-name: masna3-jobs
+name: background-jobs
 version: 0.1.0.0
 synopsis: Background jobs for Masnaع
 license: LGPL-3.0-only
@@ -65,10 +65,10 @@ library
   hs-source-dirs: src
   -- cabal-gild: discover src
   exposed-modules:
-    Masna3.Jobs.Job
-    Masna3.Jobs.Poller
-    Masna3.Jobs.Queue
-    Masna3.Jobs.Worker
+    BackgroundJobs.Job
+    BackgroundJobs.Poller
+    BackgroundJobs.Queue
+    BackgroundJobs.Worker
 
   build-depends:
     aeson,
@@ -107,17 +107,17 @@ executable jobs-server
   main-is: Main.hs
   hs-source-dirs: app
   build-depends:
+    background-jobs,
     base,
     effectful,
     log-base,
-    masna3-jobs,
     masna3-prelude,
 
   mixins:
     base hiding (Prelude),
     masna3-prelude (Prelude),
 
-test-suite masna3-jobs-test
+test-suite background-jobs-test
   import: extensions
   import: ghc-options
   import: rts-options
@@ -125,9 +125,10 @@ test-suite masna3-jobs-test
   main-is: Main.hs
   hs-source-dirs: test
   -- cabal-gild: discover test --exclude "test/Main.hs"
-  other-modules: Masna3.Jobs.Test.Utils
+  other-modules: BackgroundJobs.Test.Utils
   build-depends:
     aeson,
+    background-jobs,
     base,
     binary,
     bytestring,
@@ -141,7 +142,6 @@ test-suite masna3-jobs-test
     http-types,
     log-base,
     log-effectful,
-    masna3-jobs,
     masna3-prelude,
     monad-time-effectful,
     postgresql-simple,

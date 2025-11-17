@@ -1,4 +1,4 @@
-module Masna3.Jobs.Poller where
+module BackgroundJobs.Poller where
 
 import Data.Aeson
 import Data.Poolboy
@@ -9,8 +9,8 @@ import Effectful.Log
 import Effectful.PostgreSQL
 import Log qualified
 
-import Masna3.Jobs.Job
-import Masna3.Jobs.Worker
+import BackgroundJobs.Job
+import BackgroundJobs.Worker
 
 data PollerConfig m = PollerConfig
   { queueName :: Text

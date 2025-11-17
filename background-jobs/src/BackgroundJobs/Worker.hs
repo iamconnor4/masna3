@@ -1,4 +1,4 @@
-module Masna3.Jobs.Worker
+module BackgroundJobs.Worker
   ( WorkerConfig (..)
   , runWorker
   ) where
@@ -11,7 +11,7 @@ import Effectful.Exception
 import Effectful.Log
 import Log.Class qualified as Log
 
-import Masna3.Jobs.Job
+import BackgroundJobs.Job
 
 data WorkerConfig m payload = WorkerConfig
   { queueName :: Text

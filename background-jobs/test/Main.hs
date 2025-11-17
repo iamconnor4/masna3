@@ -21,11 +21,11 @@ import System.Environment
 import System.Exit
 import Test.Tasty
 
-import Masna3.Jobs.Job qualified as Job
-import Masna3.Jobs.Poller qualified as Poller
-import Masna3.Jobs.Queue qualified as Queue
-import Masna3.Jobs.Test.Utils
-import Masna3.Jobs.Worker (WorkerConfig (..))
+import BackgroundJobs.Job qualified as Job
+import BackgroundJobs.Poller qualified as Poller
+import BackgroundJobs.Queue qualified as Queue
+import BackgroundJobs.Test.Utils
+import BackgroundJobs.Worker (WorkerConfig (..))
 
 data JobPayload
   = PrintMessage Text
@@ -65,7 +65,7 @@ main = do
   pool <- runEff $ mkPool connString
   let env = TestEnv pool
   runEff . Reader.runReader env $ withTestPool cleanUpQueues
-  defaultMain $ testGroup "masna3-jobs tests" (specs env)
+  defaultMain $ testGroup "background-jobs tests" (specs env)
 
 specs :: TestEnv -> [TestTree]
 specs env =
@@ -83,15 +83,17 @@ testCreateNewJob = do
         WorkerConfig
           { queueName = "testqueue"
           , onException = \_ _ -> error "Caught exception"
-          , process = \payload ->
-              case payload of
-                PrintMessage msg -> Log.logInfo_ msg
-                PurgeOrphanFiles -> Log.logInfo_ "Purging orphan files…"
+          , process = \case
+              PrintMessage msg -> Log.logInfo_ msg
+              PurgeOrphanFiles -> Log.logInfo_ "Purging orphan files…"
           }
   withTestPool $ do
     Queue.createQueue "testqueue"
     Job.insertJob "testQueue" (PrintMessage "salam")
-  withTestPool $ Poller.monitorQueue pollerConfig workerConfig
+    Job.insertJob "testQueue" PurgeOrphanFiles
+  withAsync (withTestPool $ Poller.monitorQueue pollerConfig workerConfig) $ \asyncRef -> do
+    threadDelay 2_000_000
+    cancel asyncRef
 
 cleanUpQueues :: (IOE :> es, WithConnection :> es) => Eff es ()
 cleanUpQueues = do
