@@ -22,7 +22,7 @@ jobs:
         with:
           cabal-file: server/masna3.cabal
           ubuntu-version: "22.04"
-          version: 0.1.7.1
+          version: 0.1.9.1
 
   Backend_tests:
     needs: generateMatrix
