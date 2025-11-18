@@ -27,7 +27,7 @@ mkPollerConfig queueName =
           { workersCount = CapabilitiesWCS
           , workQueueName = Text.unpack queueName
           , logger = \command ->
-              Log.logTrace
+              Log.logInfo
                 "pool-worker"
                 $ object
                   [ "command" .= show command
@@ -59,6 +59,7 @@ monitorQueue pollerConfig workerConfig = withPoolboy pollerConfig.poolSettings w
               , "queue_name" .= pollerConfig.queueName
               ]
           enqueue workQueue (runWorker workerConfig job)
+          loop workQueue
         Nothing -> do
           threadDelay pollerConfig.interval
           loop workQueue

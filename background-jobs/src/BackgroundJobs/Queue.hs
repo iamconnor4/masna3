@@ -16,9 +16,9 @@ import GHC.Generics
 
 data Queue = Queue
   { name :: Text
-  , createdAt :: UTCTime
   , isPartitioned :: Bool
   , isUnlogged :: Bool
+  , createdAt :: UTCTime
   }
   deriving stock (Eq, Generic, Ord, Show)
   deriving anyclass

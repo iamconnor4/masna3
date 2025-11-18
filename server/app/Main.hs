@@ -1,5 +1,6 @@
 module Main where
 
+import BackgroundJobs.Job qualified as Job
 import BackgroundJobs.Poller qualified as Poller
 import BackgroundJobs.Queue (Queue (..))
 import BackgroundJobs.Queue qualified as Queue
@@ -20,7 +21,6 @@ import Masna3.Server (runMasna3)
 import Masna3.Server.Database
 import Masna3.Server.Environment
 import Masna3.Server.Jobs.Types
-import Masna3.Server.Model.File.Query qualified as Query
 
 main :: IO ()
 main = runEff . runConcurrent $ do
@@ -28,11 +28,25 @@ main = runEff . runConcurrent $ do
   runReader env $
     Log.withStdOutLogger $ \logger -> do
       Log.runLog "masna3-jobs" logger Log.defaultLogLevel $
-        runTime $
-          withAsync startJobs $ \_ ->
-            runMasna3
-              logger
-              env
+        runTime $ do
+          preflightChecks
+          void $ forkIO startJobs
+          runMasna3 logger env
+
+preflightChecks
+  :: ( IOE :> es
+     , Log :> es
+     , Reader Masna3Env :> es
+     )
+  => Eff es ()
+preflightChecks = withPool $ do
+  actualQueues <- Queue.listQueues
+  let queueNames = Set.map (.name) actualQueues
+  when (Set.notMember "masna3_jobs" queueNames) $ do
+    Log.logInfo "Queue does not exist. Creating" $
+      object ["queue_name" .= String "masna3_jobs"]
+    Queue.createQueue "masna3_jobs"
+    Job.insertJob "masna3_jobs" ListExpiredFiles
 
 startJobs
   :: ( Concurrent :> es
@@ -49,15 +63,7 @@ startJobs = withPool $ do
         WorkerConfig
           { queueName = "testqueue"
           , onException = \_ _ -> error "Caught exception"
-          , process = \case
-              ListExpiredFiles -> do
-                files <- Query.listExpiredFiles
-                Log.logInfo "Expired files" $
-                  object ["amount" .= length files]
+          , process = processJob
           }
 
-  actualQueues <- Queue.listQueues
-  let queueNames = Set.map (.name) actualQueues
-  when (Set.notMember "masna3_jobs" queueNames) $
-    Queue.createQueue "masna3_jobs"
   Poller.monitorQueue pollerConfig workerConfig
