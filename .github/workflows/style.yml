@@ -16,7 +16,7 @@ jobs:
         pattern: |
           api/**/*.hs
           server/**/*.hs
-          masna3-jobs/**/*.hs
+          backgrounds-jobs/**/*.hs
           masna3-prelude/**/*.hs
 
   hlint:
@@ -32,5 +32,5 @@ jobs:
     - name: 'Run HLint'
       uses: haskell-actions/hlint-run@v2
       with:
-        path: '["server/", "api/", "masna3-prelude/", "masna3-jobs/"]'
+        path: '["server/", "api/", "masna3-prelude/", "background-jobs/"]'
         fail-on: warning
