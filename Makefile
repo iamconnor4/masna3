@@ -1,6 +1,9 @@
 init: ## Initialise the project for local development
 	@./scripts/init.sh
 
+start: ## Start the masna3 server
+	@cabal run masna3
+
 build: ## Build the project
 	@cabal build all
 

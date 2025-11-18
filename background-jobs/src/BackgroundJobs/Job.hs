@@ -6,11 +6,9 @@ module BackgroundJobs.Job where
 import Data.Aeson
 import Data.List qualified as List
 import Data.Time (UTCTime)
-import Database.PostgreSQL.Simple.FromField
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.Newtypes
 import Database.PostgreSQL.Simple.SqlQQ (sql)
-import Database.PostgreSQL.Simple.ToField (ToField (..))
 import Database.PostgreSQL.Simple.Types
 import Effectful
 import Effectful.PostgreSQL (WithConnection)

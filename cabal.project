@@ -10,9 +10,11 @@ semaphore: True
 tests: True
 jobs: $ncpus
 multi-repl: True
+split-sections: True
 
 package *
   gcc-options: -march=native
+  split-sections: True
 
 allow-newer:
   amazonka-s3:*,

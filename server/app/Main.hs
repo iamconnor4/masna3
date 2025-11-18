@@ -1,9 +1,11 @@
 module Main where
 
 import BackgroundJobs.Poller qualified as Poller
+import BackgroundJobs.Queue (Queue (..))
 import BackgroundJobs.Queue qualified as Queue
 import BackgroundJobs.Worker (WorkerConfig (..))
 import Data.Aeson
+import Data.Set qualified as Set
 import Effectful
 import Effectful.Concurrent
 import Effectful.Concurrent.Async
@@ -53,5 +55,9 @@ startJobs = withPool $ do
                 Log.logInfo "Expired files" $
                   object ["amount" .= length files]
           }
-  Queue.createQueue "masna3_jobs"
+
+  actualQueues <- Queue.listQueues
+  let queueNames = Set.map (.name) actualQueues
+  when (Set.notMember "masna3_jobs" queueNames) $
+    Queue.createQueue "masna3_jobs"
   Poller.monitorQueue pollerConfig workerConfig

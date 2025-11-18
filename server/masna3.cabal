@@ -93,7 +93,6 @@ library
     effectful-core,
     effectful-postgresql,
     envparse,
-    heptapod,
     log-base,
     log-effectful,
     masna3-api,
@@ -107,8 +106,6 @@ library
     servant-server,
     text,
     time,
-    uuid-types,
-    wai,
     wai-log,
     warp,
 
@@ -128,6 +125,7 @@ executable masna3-server
     aeson,
     background-jobs,
     base,
+    containers,
     effectful,
     effectful-postgresql,
     log-base,
@@ -135,6 +133,8 @@ executable masna3-server
     masna3,
     masna3-prelude,
     monad-time-effectful,
+    optics-core,
+    text,
 
   mixins:
     base hiding (Prelude),
@@ -155,7 +155,6 @@ test-suite masna3-test
   build-depends:
     aeson,
     base,
-    binary,
     bytestring,
     containers,
     effectful,

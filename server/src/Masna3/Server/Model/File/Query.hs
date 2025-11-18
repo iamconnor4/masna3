@@ -6,7 +6,6 @@ module Masna3.Server.Model.File.Query
   , listExpiredFiles
   ) where
 
-import Data.List
 import Database.PostgreSQL.Entity
 import Database.PostgreSQL.Entity.Internal.QQ
 import Database.PostgreSQL.Simple.FromRow (FromRow (..))

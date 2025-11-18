@@ -3,18 +3,26 @@
 
 module BackgroundJobs.Queue where
 
-import Data.Aeson
+import Data.Set (Set)
+import Data.Set qualified as Set
 import Data.Time (UTCTime)
-import Database.PostgreSQL.Simple.FromField
 import Database.PostgreSQL.Simple.FromRow
-import Database.PostgreSQL.Simple.Newtypes
 import Database.PostgreSQL.Simple.SqlQQ (sql)
-import Database.PostgreSQL.Simple.ToField (ToField (..))
 import Database.PostgreSQL.Simple.Types
 import Effectful
 import Effectful.PostgreSQL (WithConnection)
 import Effectful.PostgreSQL qualified as DB
 import GHC.Generics
+
+data Queue = Queue
+  { name :: Text
+  , createdAt :: UTCTime
+  , isPartitioned :: Bool
+  , isUnlogged :: Bool
+  }
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving anyclass
+    (FromRow)
 
 createQueue
   :: (IOE :> es, WithConnection :> es)
@@ -28,3 +36,15 @@ createQueue queueName = do
       [sql|
     SELECT * FROM pgmq.create(?)
     |]
+
+listQueues
+  :: (IOE :> es, WithConnection :> es)
+  => Eff es (Set Queue)
+listQueues = do
+  result <- DB.query_ q
+  pure $ Set.fromList result
+  where
+    q =
+      [sql|
+        SELECT * FROM pgmq.list_queues()
+        |]
