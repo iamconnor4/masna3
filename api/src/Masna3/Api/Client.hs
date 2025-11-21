@@ -1,6 +1,7 @@
 module Masna3.Api.Client
   ( registerFile
   , confirmFile
+  , deleteFile
   ) where
 
 import Data.Proxy
@@ -28,4 +29,12 @@ confirmFile fileId =
     // (.api)
     // (.files)
     // (.confirm)
+    /: fileId
+
+deleteFile :: FileId -> ClientM NoContent
+deleteFile fileId =
+  masna3Client
+    // (.api)
+    // (.files)
+    // (.delete)
     /: fileId

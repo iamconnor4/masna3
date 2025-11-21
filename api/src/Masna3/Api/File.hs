@@ -47,9 +47,16 @@ type CancelFileUpload =
     :> ReqBody '[JSON] UploadCancellationForm
     :> Post '[JSON] NoContent
 
+type DeleteFile =
+  Summary "Delete a file"
+    :> Capture "file_id" FileId
+    :> "delete"
+    :> Delete '[JSON] NoContent
+
 data FileRoutes mode = FileRoutes
   { register :: mode :- RegisterFile
   , confirm :: mode :- ConfirmFileUpload
   , cancel :: mode :- CancelFileUpload
+  , delete :: mode :- DeleteFile
   }
   deriving stock (Generic)
