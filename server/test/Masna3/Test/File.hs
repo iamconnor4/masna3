@@ -15,6 +15,8 @@ spec env =
     [ testThis env "Register file" testRegisterFile
     , testThis env "Confirm File" testConfirmFile
     , testThis env "Confirm File Invalid Transition" testConfirmFileInvalidTransition
+    , testThis env "Delete File" testDeleteFile
+    , testThis env "Delete File Invalid Transition" testDeleteFileInvalidTransition
     ]
 
 testRegisterFile :: TestEff ()
@@ -46,3 +48,26 @@ testConfirmFileInvalidTransition = do
   result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
   void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
   void $ assertLeftWithStatus "Confirm File" 500 =<< runRequest (Client.confirmFile result.fileId)
+
+testDeleteFile :: TestEff ()
+testDeleteFile = do
+  owner <- newOwner "test-client-4"
+  withTestPool $ Update.insertOwner owner
+  let fileName = "toto.txt"
+      mimeType = "text/plain"
+  let form = FileRegistrationForm fileName owner.ownerId mimeType
+  result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
+  void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
+  void $ assertRight "Delete File" =<< runRequest (Client.deleteFile result.fileId)
+
+testDeleteFileInvalidTransition :: TestEff ()
+testDeleteFileInvalidTransition = do
+  owner <- newOwner "test-client-5"
+  withTestPool $ Update.insertOwner owner
+  let fileName = "toto.txt"
+      mimeType = "text/plain"
+  let form = FileRegistrationForm fileName owner.ownerId mimeType
+  result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
+  void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
+  void $ assertRight "Delete File" =<< runRequest (Client.deleteFile result.fileId)
+  void $ assertLeftWithStatus "Delete File" 404 =<< runRequest (Client.deleteFile result.fileId)
