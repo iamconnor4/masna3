@@ -97,5 +97,5 @@ testCreateNewJob = do
 
 cleanUpQueues :: (IOE :> es, WithConnection :> es) => Eff es ()
 cleanUpQueues = do
-  _ :: [Only Int] <- DB.query_ "select * from pgmq.purge_queue('testqueue')"
+  _ :: [Only Bool] <- DB.query_ "select * from pgmq.drop_queue('testqueue')"
   pure ()

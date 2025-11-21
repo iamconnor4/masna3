@@ -30,8 +30,8 @@ main = runEff . runConcurrent $ do
       Log.runLog "masna3-jobs" logger Log.defaultLogLevel $
         runTime $ do
           preflightChecks
-          void $ forkIO startJobs
-          runMasna3 logger env
+          withAsync startJobs $ \_ ->
+            runMasna3 logger env
 
 preflightChecks
   :: ( IOE :> es
