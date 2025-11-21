@@ -4,11 +4,11 @@
 module Masna3.Server.Model.File.Update where
 
 import Data.Time
-import Data.UUID.Types
 import Database.PostgreSQL.Entity
 import Database.PostgreSQL.Simple.SqlQQ (sql)
 import Effectful
 import Effectful.PostgreSQL
+import Masna3.Api.ArchivedFile.ArchivedFileId
 import Masna3.Api.File.FileId
 
 import Masna3.Server.Model.File.Types
@@ -25,7 +25,7 @@ confirmFile fileId timestamp = void $ execute q (timestamp, fileId)
         WHERE file_id = ?;
        |]
 
-deleteFile :: (IOE :> es, WithConnection :> es) => FileId -> UUID -> UTCTime -> Eff es ()
+deleteFile :: (IOE :> es, WithConnection :> es) => FileId -> ArchivedFileId -> UTCTime -> Eff es ()
 deleteFile fileId recordId timestamp = void $ execute q (fileId, recordId, timestamp)
   where
     q =

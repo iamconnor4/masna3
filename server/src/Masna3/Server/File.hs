@@ -7,7 +7,7 @@ import Effectful.Error.Static qualified as Error
 import Effectful.Log qualified as Log
 import Effectful.Reader.Static qualified as Reader
 import Effectful.Time qualified as Time
-import Heptapod qualified
+import Masna3.Api.ArchivedFile.ArchivedFileId
 import Masna3.Api.File
 import Masna3.Api.File.FileId
 import Servant.API.ContentTypes
@@ -67,7 +67,7 @@ cancelHandler _ _ = pure NoContent
 deleteHandler :: FileId -> Eff RouteEffects NoContent
 deleteHandler fileId = do
   file <- guardThatFileExists fileId
-  recordId <- Heptapod.generate
+  recordId <- newArchivedFileId
   timestamp <- Time.currentTime
   withPool (Update.deleteFile file.fileId recordId timestamp)
   pure NoContent
