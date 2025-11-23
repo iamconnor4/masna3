@@ -12,6 +12,8 @@ import Database.PostgreSQL.Simple.ToField
 import Database.PostgreSQL.Simple.Types
 import Deriving.Aeson
 import Effectful
+import Effectful.Concurrent
+import Effectful.Concurrent.Async
 import Effectful.Log (Log)
 import Effectful.Log qualified as Log
 import Effectful.PostgreSQL (WithConnection)
@@ -90,7 +92,6 @@ testCreateNewJob = do
   withTestPool $ do
     Queue.createQueue "testqueue"
     Job.insertJob "testQueue" (PrintMessage "salam")
-    Job.insertJob "testQueue" PurgeOrphanFiles
   withAsync (withTestPool $ Poller.monitorQueue pollerConfig workerConfig) $ \asyncRef -> do
     threadDelay 2_000_000
     cancel asyncRef
