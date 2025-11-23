@@ -4,8 +4,8 @@ packages:
   ./masna3-prelude
   ./background-jobs
 
-with-compiler: ghc-9.10.2
-with-hc-pkg: ghc-pkg-9.10.2
+with-compiler: ghc-9.10.3
+with-hc-pkg: ghc-pkg-9.10.3
 semaphore: True
 tests: True
 jobs: $ncpus
