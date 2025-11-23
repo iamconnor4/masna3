@@ -1,5 +1,8 @@
 module Masna3.Server.Jobs.Types where
 
+import BackgroundJobs.Poller
+import BackgroundJobs.Poller qualified as Poller
+import BackgroundJobs.Worker
 import Data.Aeson
 import Database.PostgreSQL.Simple.FromField
 import Database.PostgreSQL.Simple.Newtypes
@@ -12,9 +15,11 @@ import Effectful.PostgreSQL.Connection
 import Effectful.Time
 
 import Masna3.Server.Model.File.Query qualified as Query
+import Masna3.Server.Model.File.Types
+import Masna3.Server.Model.File.Update qualified as Update
 
 data Masna3Job
-  = ListExpiredFiles
+  = PurgeExpiredFiles
   deriving stock (Eq, Generic, Ord, Show)
   deriving
     (FromJSON, ToJSON)
@@ -23,6 +28,23 @@ data Masna3Job
   deriving
     (FromField, ToField)
     via Aeson Masna3Job
+
+pollerConfig :: Log :> es => PollerConfig (Eff es)
+pollerConfig = Poller.mkPollerConfig "masna3_jobs"
+
+workerConfig
+  :: ( IOE :> es
+     , Log :> es
+     , Time :> es
+     , WithConnection :> es
+     )
+  => WorkerConfig (Eff es) Masna3Job
+workerConfig =
+  WorkerConfig
+    { queueName = "masna3_jobs"
+    , onException = \_ _ -> error "Caught exception"
+    , process = processJob
+    }
 
 processJob
   :: ( IOE :> es
@@ -33,7 +55,9 @@ processJob
   => Masna3Job
   -> Eff es ()
 processJob = \case
-  ListExpiredFiles -> do
+  PurgeExpiredFiles -> do
     files <- Query.listExpiredFiles
     Log.logInfo "Expired files" $
       object ["amount" .= length files]
+    forM_ files $ \file ->
+      Update.deleteFile file.fileId

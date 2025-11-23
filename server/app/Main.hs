@@ -4,7 +4,6 @@ import BackgroundJobs.Job qualified as Job
 import BackgroundJobs.Poller qualified as Poller
 import BackgroundJobs.Queue (Queue (..))
 import BackgroundJobs.Queue qualified as Queue
-import BackgroundJobs.Worker (WorkerConfig (..))
 import Data.Aeson
 import Data.Set qualified as Set
 import Effectful
@@ -12,7 +11,6 @@ import Effectful.Concurrent
 import Effectful.Concurrent.Async
 import Effectful.Log (Log)
 import Effectful.Log qualified as Log
-import Effectful.PostgreSQL.Connection
 import Effectful.Reader.Static
 import Effectful.Time
 import Log.Backend.StandardOutput qualified as Log
@@ -46,7 +44,7 @@ preflightChecks = withPool $ do
     Log.logInfo "Queue does not exist. Creating" $
       object ["queue_name" .= String "masna3_jobs"]
     Queue.createQueue "masna3_jobs"
-    Job.insertJob "masna3_jobs" ListExpiredFiles
+    Job.insertJob "masna3_jobs" PurgeExpiredFiles
 
 startJobs
   :: ( Concurrent :> es
@@ -57,13 +55,4 @@ startJobs
      )
   => Eff es ()
 startJobs = withPool $ do
-  let pollerConfig = Poller.mkPollerConfig "masna3_jobs"
-  let workerConfig :: (IOE :> es, Log :> es, Time :> es, WithConnection :> es) => WorkerConfig (Eff es) Masna3Job
-      workerConfig =
-        WorkerConfig
-          { queueName = "testqueue"
-          , onException = \_ _ -> error "Caught exception"
-          , process = processJob
-          }
-
   Poller.monitorQueue pollerConfig workerConfig

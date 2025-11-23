@@ -83,6 +83,7 @@ library
     aeson,
     amazonka,
     amazonka-s3,
+    background-jobs,
     base >=4.20 && <4.21,
     biscuit-haskell,
     biscuit-servant,
@@ -154,6 +155,7 @@ test-suite masna3-test
 
   build-depends:
     aeson,
+    background-jobs,
     base,
     bytestring,
     containers,

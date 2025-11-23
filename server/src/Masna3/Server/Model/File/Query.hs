@@ -6,6 +6,8 @@ module Masna3.Server.Model.File.Query
   , listExpiredFiles
   ) where
 
+import Data.Set (Set)
+import Data.Set qualified as Set
 import Database.PostgreSQL.Entity
 import Database.PostgreSQL.Entity.Internal.QQ
 import Database.PostgreSQL.Simple.FromRow (FromRow (..))
@@ -23,10 +25,11 @@ import Masna3.Server.Model.File.Types
 getFileById :: (IOE :> es, WithConnection :> es) => FileId -> Eff es (Maybe File)
 getFileById fileId = queryOne (_selectWhere @File [[field| file_id |]]) (Only fileId)
 
-listExpiredFiles :: (IOE :> es, Time :> es, WithConnection :> es) => Eff es (List File)
+listExpiredFiles :: (IOE :> es, Time :> es, WithConnection :> es) => Eff es (Set File)
 listExpiredFiles = do
   now <- currentTime
-  query q (Only now)
+  result <- query q (Only now)
+  pure $ Set.fromList result
   where
     q =
       [sql|
