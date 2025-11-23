@@ -1,13 +1,13 @@
 module BackgroundJobs.Poller where
 
-import Control.Concurrent (threadDelay)
 import Data.Aeson
 import Data.Poolboy
 import Data.Text qualified as Text
 import Effectful
-import Effectful.Concurrent hiding (threadDelay)
+import Effectful.Concurrent
 import Effectful.Log
 import Effectful.PostgreSQL
+import Log qualified
 
 import BackgroundJobs.Job
 import BackgroundJobs.Worker
@@ -20,13 +20,19 @@ data PollerConfig m = PollerConfig
   , poolSettings :: PoolboySettings m
   }
 
-mkPollerConfig :: Text -> PollerConfig IO
+mkPollerConfig :: Log :> es => Text -> PollerConfig (Eff es)
 mkPollerConfig queueName =
   let poolSettings =
         PoolboySettings
           { workersCount = CapabilitiesWCS
           , workQueueName = Text.unpack queueName
-          , logger = \x -> putStrLn $ "************* " <> show x
+          , logger = \command ->
+              Log.logInfo
+                "pool-worker"
+                $ object
+                  [ "command" .= show command
+                  , "queue" .= queueName
+                  ]
           }
    in PollerConfig
         { queueName
@@ -36,31 +42,23 @@ mkPollerConfig queueName =
 
 monitorQueue
   :: (Concurrent :> es, FromJSON job, IOE :> es, Log :> es, WithConnection :> es)
-  => PollerConfig IO
+  => PollerConfig (Eff es)
   -> WorkerConfig (Eff es) job
   -> Eff es ()
-monitorQueue pollerConfig workerConfig =
-  withEffToIO (ConcUnlift Ephemeral Unlimited) $ \unlift ->
-    liftIO $
-      monitorQueueIO
-        pollerConfig
-        (unlift $ readJob pollerConfig.queueName)
-        (unlift . runWorker workerConfig)
-
-monitorQueueIO
-  :: PollerConfig IO
-  -> IO (Maybe job)
-  -> (job -> IO ())
-  -> IO ()
-monitorQueueIO pollerConfig readJob' runWorker' =
-  withPoolboy pollerConfig.poolSettings waitingStopFinishWorkers $ \workQueue ->
-    loop workQueue
+monitorQueue pollerConfig workerConfig = withPoolboy pollerConfig.poolSettings waitingStopFinishWorkers $ \workQueue ->
+  loop workQueue
   where
     loop workQueue = do
-      mJob <- readJob'
+      mJob <- readJob pollerConfig.queueName
       case mJob of
         Just job -> do
-          enqueue workQueue (runWorker' job)
+          Log.logInfo "Dispatching job" $
+            object
+              [ "job_id" .= job.id
+              , "job_message" .= job.message
+              , "queue_name" .= pollerConfig.queueName
+              ]
+          enqueue workQueue (runWorker workerConfig job)
           loop workQueue
         Nothing -> do
           threadDelay pollerConfig.interval
