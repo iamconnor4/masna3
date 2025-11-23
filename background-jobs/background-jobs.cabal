@@ -87,6 +87,7 @@ library
     monad-time-effectful,
     pg-entity,
     poolboy,
+    effectful-poolboy,
     postgresql-simple,
     prometheus-client,
     resource-pool,
