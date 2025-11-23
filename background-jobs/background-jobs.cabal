@@ -101,23 +101,6 @@ library
     base hiding (Prelude),
     masna3-prelude (Prelude),
 
-executable jobs-server
-  import: extensions
-  import: ghc-options
-  import: rts-options
-  main-is: Main.hs
-  hs-source-dirs: app
-  build-depends:
-    background-jobs,
-    base,
-    effectful,
-    log-base,
-    masna3-prelude,
-
-  mixins:
-    base hiding (Prelude),
-    masna3-prelude (Prelude),
-
 test-suite background-jobs-test
   import: extensions
   import: ghc-options
