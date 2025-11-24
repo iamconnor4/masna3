@@ -42,6 +42,7 @@ listExpiredFiles = do
                , created_at
                , updated_at
                , uploaded_at
+          FROM files
           WHERE created_at >= ?
             AND uploaded_at IS NULL
         |]

@@ -12,6 +12,7 @@ import Test.Tasty
 
 import Masna3.Server.Jobs.Types
 import Masna3.Server.Model.File.Query qualified as Query
+import Masna3.Server.Model.File.Types
 import Masna3.Server.Model.Owner.Types
 import Masna3.Server.Model.Owner.Update qualified as Update
 import Masna3.Test.Utils
@@ -83,7 +84,7 @@ testDeleteFileInvalidTransition = do
 
 testUnconfirmedFileGetsTrashed :: TestEff ()
 testUnconfirmedFileGetsTrashed = do
-  owner <- newOwner "test-client-5"
+  owner <- newOwner "test-client-6"
   withTestPool $ Update.insertOwner owner
   let fileName = "file-to-delete.txt"
       mimeType = "text/plain"
@@ -93,12 +94,10 @@ testUnconfirmedFileGetsTrashed = do
   withTestPool $ do
     Queue.createQueue "masna3_jobs"
     Job.insertJob "masna3_jobs" PurgeExpiredFiles
-  Async.withAsync (withTestPool $ do Poller.monitorQueue pollerConfig workerConfig) $ \asyncRef -> do
-    threadDelay 2_000_000
-    expiredFileIds <- (.fileId) <$> (withTestPool Query.listExpiredFiles)
-    assertBool
-      "Pending file is present amongst expired file Ids"
-      (Set.member result.fileId expiredFileIds)
-
-    assertNothing "File is deleted from files table" =<< withTestPool (Query.getFileById result.fileId)
+  Async.withAsync (withTestPool (Poller.monitorQueue pollerConfig workerConfig)) $ \asyncRef -> do
+    threadDelay 6_000_000
+    r <- withTestPool (Query.getFileById result.fileId)
+    case r of
+      Nothing -> pure ()
+      Just file -> assertFailure $ "Found the file in the files table! " <> show file
     Async.cancel asyncRef

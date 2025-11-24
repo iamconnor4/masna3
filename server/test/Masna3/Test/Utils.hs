@@ -4,6 +4,7 @@ module Masna3.Test.Utils
   , withTestPool
   , testThis
   , assertEqual
+  , assertFailure
   , assertBool
   , assertJust
   , assertNothing
@@ -94,6 +95,9 @@ assertEqual message expected actual = liftIO $ Test.assertEqual message expected
 
 assertBool :: HasCallStack => String -> Bool -> TestEff ()
 assertBool message assertion = liftIO $ Test.assertBool message assertion
+
+assertFailure :: HasCallStack => String -> TestEff ()
+assertFailure = liftIO . Test.assertFailure
 
 assertJust :: HasCallStack => String -> Maybe a -> TestEff a
 assertJust _ (Just a) = pure a
