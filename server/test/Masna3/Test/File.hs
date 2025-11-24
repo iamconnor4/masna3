@@ -94,10 +94,11 @@ testUnconfirmedFileGetsTrashed = do
   withTestPool $ do
     Queue.createQueue "masna3_jobs"
     Job.insertJob "masna3_jobs" PurgeExpiredFiles
-  Async.withAsync (withTestPool (Poller.monitorQueue pollerConfig workerConfig)) $ \asyncRef -> do
-    threadDelay 6_000_000
-    r <- withTestPool (Query.getFileById result.fileId)
-    case r of
-      Nothing -> pure ()
-      Just file -> assertFailure $ "Found the file in the files table! " <> show file
-    Async.cancel asyncRef
+  Async.race_
+    (withTestPool (Poller.monitorQueue pollerConfig workerConfig))
+    ( do
+        r <- withTestPool (Query.getFileById result.fileId)
+        case r of
+          Nothing -> pure ()
+          Just file -> assertFailure $ "Found the file in the files table! " <> show file
+    )
