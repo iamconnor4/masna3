@@ -42,7 +42,7 @@ docker-build: ## Build and start the container cluster
 	@docker compose build devel
 
 docker-up: ## Start the container cluster
-	@docker compose up -d
+	@docker compose up -d --build
 
 docker-stop: ## Stop the container cluster without removing the containers
 	@docker compose stop
