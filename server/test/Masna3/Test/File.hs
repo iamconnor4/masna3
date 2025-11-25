@@ -2,8 +2,8 @@ module Masna3.Test.File where
 
 import BackgroundJobs.Job qualified as Job
 import BackgroundJobs.Poller qualified as Poller
-import Effectful.Concurrent
 import BackgroundJobs.Queue qualified as Queue
+import Effectful.Concurrent
 import Effectful.Concurrent.Async qualified as Async
 import Masna3.Api.Client qualified as Client
 import Masna3.Api.File
@@ -95,7 +95,7 @@ testUnconfirmedFileGetsTrashed = do
   Async.race_
     (withTestPool (Poller.monitorQueue pollerConfig workerConfig))
     ( do
-        threadDelay 5_000_000
+        threadDelay 500_000
         r <- withTestPool (Query.getFileById result.fileId)
         case r of
           Nothing -> pure ()

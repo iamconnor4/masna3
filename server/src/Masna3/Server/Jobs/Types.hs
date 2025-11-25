@@ -12,7 +12,8 @@ import Effectful
 import Effectful.Log (Log)
 import Effectful.Log qualified as Log
 import Effectful.PostgreSQL.Connection
-import Effectful.Time
+import Effectful.Time (Time)
+import Effectful.Time qualified as Time
 
 import Masna3.Server.Model.File.Query qualified as Query
 import Masna3.Server.Model.File.Types
@@ -42,7 +43,7 @@ workerConfig
 workerConfig =
   WorkerConfig
     { queueName = "masna3_jobs"
-    , onException = \_ _ -> error "Caught exception"
+    , onException = \j e -> error $ "Caught exception while processing Job \"" <> show j <> "\": " <> show e
     , process = processJob
     }
 
@@ -56,7 +57,8 @@ processJob
   -> Eff es ()
 processJob = \case
   PurgeExpiredFiles -> do
-    files <- Query.listExpiredFiles
+    now <- Time.currentTime
+    files <- Query.listExpiredFiles now
     Log.logInfo "Expired files" $
       object ["amount" .= length files]
     forM_ files $ \file ->

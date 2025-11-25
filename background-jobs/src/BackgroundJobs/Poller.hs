@@ -28,7 +28,7 @@ mkPollerConfig queueName =
           { workersCount = CapabilitiesWCS
           , workQueueName = Text.unpack queueName
           , logger = \command ->
-              Log.logInfo
+              Log.logTrace
                 "pool-worker"
                 $ object
                   [ "command" .= show command
