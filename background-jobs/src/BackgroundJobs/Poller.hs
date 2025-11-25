@@ -1,7 +1,8 @@
 module BackgroundJobs.Poller where
 
 import Data.Aeson
-import Data.Poolboy
+import Data.Poolboy.Effectful
+import Data.Poolboy.Tactics.Effectful
 import Data.Text qualified as Text
 import Effectful
 import Effectful.Concurrent
@@ -45,10 +46,9 @@ monitorQueue
   => PollerConfig (Eff es)
   -> WorkerConfig (Eff es) job
   -> Eff es ()
-monitorQueue pollerConfig workerConfig = withPoolboy pollerConfig.poolSettings waitingStopFinishWorkers $ \workQueue ->
-  loop workQueue
+monitorQueue pollerConfig workerConfig = concurrentM_ pollerConfig.poolSettings loop
   where
-    loop workQueue = do
+    loop = do
       mJob <- readJob pollerConfig.queueName
       case mJob of
         Just job -> do
@@ -58,8 +58,7 @@ monitorQueue pollerConfig workerConfig = withPoolboy pollerConfig.poolSettings w
               , "job_message" .= job.message
               , "queue_name" .= pollerConfig.queueName
               ]
-          enqueue workQueue (runWorker workerConfig job)
-          loop workQueue
+          pure $ Just $ runWorker workerConfig job
         Nothing -> do
           threadDelay pollerConfig.interval
-          loop workQueue
+          loop
