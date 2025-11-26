@@ -1,6 +1,9 @@
 init: ## Initialise the project for local development
 	@./scripts/init.sh
 
+start: ## Start the masna3 server
+	@cabal run masna3
+
 build: ## Build the project
 	@cabal build all
 
@@ -19,16 +22,18 @@ watch-test: ## Load the tests in ghcid and reload them on file change
 style: ## Run the code stylers
 	@cd server ; cabal-gild --mode=format --io=masna3.cabal
 	@cd api ; cabal-gild --mode=format --io=masna3-api.cabal
+	@cd masna3-prelude ; cabal-gild --mode=format --io=masna3-prelude.cabal
+	@cd background-jobs ; cabal-gild --mode=format --io=background-jobs.cabal
 	@cabal-gild --mode=format --io=cabal.project
-	@fourmolu -q --mode inplace server api
-	@find server api -name "*.hs" | xargs -P $(PROCS) -I {} hlint --refactor-options="-i" --refactor {}
+	@fourmolu -q --mode inplace server api background-jobs masna3-prelude
 
 style-quick: ## Run the code stylers are changed files
 	@cd server ; cabal-gild --mode=format --io=masna3.cabal
 	@cd api ; cabal-gild --mode=format --io=masna3-api.cabal
+	@cd masna3-prelude ; cabal-gild --mode=format --io=masna3-prelude.cabal
+	@cd background-jobs ; cabal-gild --mode=format --io=background-jobs.cabal
 	@cabal-gild --mode=format --io=cabal.project
-	@git diff origin --name-only api server | xargs -P $(PROCS) -I {} fourmolu -q -i {}
-	@git diff origin --name-only api server | xargs -P $(PROCS) -I {} hlint --refactor-options="-i" --refactor {}
+	@git diff origin --name-only api server background-jobs masna3-prelude | xargs -P $(PROCS) -I {} fourmolu -q -i {}
 
 tags: ## Generate ctags for the project with `ghc-tags`
 	@ghc-tags -c api server
@@ -37,7 +42,7 @@ docker-build: ## Build and start the container cluster
 	@docker compose build devel
 
 docker-up: ## Start the container cluster
-	@docker compose up -d
+	@docker compose up -d --build
 
 docker-stop: ## Stop the container cluster without removing the containers
 	@docker compose stop

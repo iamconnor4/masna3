@@ -4,8 +4,10 @@ module Masna3.Test.Utils
   , withTestPool
   , testThis
   , assertEqual
+  , assertFailure
   , assertBool
   , assertJust
+  , assertNothing
   , assertRight
   , assertLeft
   , assertLeftWithStatus
@@ -94,9 +96,16 @@ assertEqual message expected actual = liftIO $ Test.assertEqual message expected
 assertBool :: HasCallStack => String -> Bool -> TestEff ()
 assertBool message assertion = liftIO $ Test.assertBool message assertion
 
+assertFailure :: HasCallStack => String -> TestEff ()
+assertFailure = liftIO . Test.assertFailure
+
 assertJust :: HasCallStack => String -> Maybe a -> TestEff a
 assertJust _ (Just a) = pure a
 assertJust message Nothing = liftIO $ Test.assertFailure message
+
+assertNothing :: HasCallStack => String -> Maybe a -> TestEff ()
+assertNothing message (Just _) = liftIO $ Test.assertFailure message
+assertNothing _ Nothing = pure ()
 
 assertRight :: HasCallStack => String -> Either a b -> TestEff b
 assertRight _ (Right b) = pure b

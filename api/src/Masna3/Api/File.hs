@@ -2,7 +2,7 @@ module Masna3.Api.File where
 
 import Data.Aeson
 import Data.Text
-import GHC.Generics
+import Deriving.Aeson
 import Servant.API
 
 import Masna3.Api.File.FileId
@@ -14,20 +14,29 @@ data FileRegistrationForm = FileRegistrationForm
   , mimeType :: Text
   }
   deriving stock (Eq, Generic, Ord, Show)
-  deriving anyclass (FromJSON, ToJSON)
+  deriving
+    (FromJSON, ToJSON)
+    via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField])
+          FileRegistrationForm
 
 data FileRegistrationResult = FileRegistrationResult
   { fileId :: FileId
   , url :: Text
   }
   deriving stock (Eq, Generic, Ord, Show)
-  deriving anyclass (FromJSON, ToJSON)
+  deriving
+    (FromJSON, ToJSON)
+    via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField])
+          FileRegistrationResult
 
 data UploadCancellationForm = UploadCancellationForm
   { fileId :: FileId
   }
   deriving stock (Eq, Generic, Ord, Show)
-  deriving anyclass (FromJSON, ToJSON)
+  deriving
+    (FromJSON, ToJSON)
+    via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField])
+          UploadCancellationForm
 
 type RegisterFile =
   Summary "Register a file for upload"

@@ -46,5 +46,6 @@ specs env =
 
 cleanUp :: (IOE :> es, WithConnection :> es) => Eff es ()
 cleanUp = do
-  void $ execute "DELETE FROM files" ()
-  void $ execute "DELETE FROM owners" ()
+  void $ execute_ "DELETE FROM files"
+  void $ execute_ "DELETE FROM owners"
+  void $ execute_ "DELETE FROM archived_files"

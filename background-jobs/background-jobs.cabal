@@ -1,11 +1,11 @@
 cabal-version: 3.12
-name: masna3
+name: background-jobs
 version: 0.1.0.0
-synopsis: File Storage Proxy
+synopsis: Background jobs for Masnaع
 license: LGPL-3.0-only
 license-file: ../LICENSE
 author: Théophile Choutri de Tarlé
-maintainer: The Masna Contributors
+maintainer: The Masnaع Contributors
 build-type: Simple
 extra-doc-files: ../CHANGELOG.md
 tested-with: ghc ==9.10.3
@@ -13,6 +13,7 @@ tested-with: ghc ==9.10.3
 source-repository head
   type: git
   location: https://github.com/tchoutri/masna3
+  subdir: jobs
 
 common extensions
   default-extensions:
@@ -61,87 +62,46 @@ common rts-options
 library
   import: extensions
   import: ghc-options
+  hs-source-dirs: src
   -- cabal-gild: discover src
   exposed-modules:
-    Masna3.Server
-    Masna3.Server.AWS.URL
-    Masna3.Server.Config
-    Masna3.Server.Database
-    Masna3.Server.Effects
-    Masna3.Server.Environment
-    Masna3.Server.Error
-    Masna3.Server.File
-    Masna3.Server.Jobs.Types
-    Masna3.Server.Model.File.Query
-    Masna3.Server.Model.File.Types
-    Masna3.Server.Model.File.Update
-    Masna3.Server.Model.Owner.Query
-    Masna3.Server.Model.Owner.Types
-    Masna3.Server.Model.Owner.Update
+    BackgroundJobs.Job
+    BackgroundJobs.Poller
+    BackgroundJobs.Queue
+    BackgroundJobs.Worker
 
   build-depends:
     aeson,
-    amazonka,
-    amazonka-s3,
-    background-jobs,
     base >=4.20 && <4.21,
-    biscuit-haskell,
-    biscuit-servant,
     bytestring,
     containers,
     deriving-aeson,
     effectful,
     effectful-core,
+    effectful-poolboy,
     effectful-postgresql,
     envparse,
+    heptapod,
     log-base,
     log-effectful,
-    masna3-api,
     masna3-prelude,
     monad-time-effectful,
-    network,
     pg-entity,
+    poolboy,
     postgresql-simple,
+    prometheus-client,
     resource-pool,
     servant,
     servant-server,
     text,
     time,
-    wai-log,
-    warp,
+    uuid-types,
 
   mixins:
     base hiding (Prelude),
     masna3-prelude (Prelude),
 
-  hs-source-dirs: src
-
-executable masna3-server
-  import: extensions
-  import: ghc-options
-  import: rts-options
-  main-is: Main.hs
-  hs-source-dirs: app
-  build-depends:
-    aeson,
-    background-jobs,
-    base,
-    containers,
-    effectful,
-    effectful-postgresql,
-    log-base,
-    log-effectful,
-    masna3,
-    masna3-prelude,
-    monad-time-effectful,
-    optics-core,
-    text,
-
-  mixins:
-    base hiding (Prelude),
-    masna3-prelude (Prelude),
-
-test-suite masna3-test
+test-suite background-jobs-test
   import: extensions
   import: ghc-options
   import: rts-options
@@ -149,16 +109,15 @@ test-suite masna3-test
   main-is: Main.hs
   hs-source-dirs: test
   -- cabal-gild: discover test --exclude "test/Main.hs"
-  other-modules:
-    Masna3.Test.File
-    Masna3.Test.Utils
-
+  other-modules: BackgroundJobs.Test.Utils
   build-depends:
     aeson,
     background-jobs,
     base,
+    binary,
     bytestring,
     containers,
+    deriving-aeson,
     effectful,
     effectful-core,
     effectful-postgresql,
@@ -167,11 +126,10 @@ test-suite masna3-test
     http-types,
     log-base,
     log-effectful,
-    masna3,
-    masna3-api,
     masna3-prelude,
     monad-time-effectful,
     postgresql-simple,
+    resource-pool,
     sel,
     servant-client,
     strict-mutable-base,

@@ -3,6 +3,7 @@ source environment.local.sh
 export MASNA3_DB_DATABASE="masna3_test"
 
 export MASNA3_DB_CONNSTRING="host=masna3-database dbname=masna3_test user=postgres password=postgres port=5432"
+export TEST_CONNSTRING="$MASNA3_DB_CONNSTRING"
 
 export MASNA3_ZIPKIN_AGENT_HOST="localhost"
 export MASNA3_ZIPKIN_AGENT_PORT="8080"

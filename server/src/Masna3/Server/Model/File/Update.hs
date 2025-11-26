@@ -8,6 +8,8 @@ import Database.PostgreSQL.Entity
 import Database.PostgreSQL.Simple.SqlQQ (sql)
 import Effectful
 import Effectful.PostgreSQL
+import Effectful.Time (Time)
+import Effectful.Time qualified as Time
 import Masna3.Api.ArchivedFile.ArchivedFileId
 import Masna3.Api.File.FileId
 
@@ -25,8 +27,11 @@ confirmFile fileId timestamp = void $ execute q (timestamp, fileId)
         WHERE file_id = ?;
        |]
 
-deleteFile :: (IOE :> es, WithConnection :> es) => FileId -> ArchivedFileId -> UTCTime -> Eff es ()
-deleteFile fileId recordId timestamp = void $ execute q (fileId, recordId, timestamp)
+deleteFile :: (IOE :> es, Time :> es, WithConnection :> es) => FileId -> Eff es ()
+deleteFile fileId = do
+  timestamp <- Time.currentTime
+  archivedFileId <- newArchivedFileId
+  void $ execute q (fileId, archivedFileId, timestamp)
   where
     q =
       [sql|

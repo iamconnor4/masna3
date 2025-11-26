@@ -22,7 +22,7 @@ jobs:
         with:
           cabal-file: server/masna3.cabal
           ubuntu-version: "22.04"
-          version: 0.1.7.1
+          version: 0.1.9.1
 
   Backend_tests:
     needs: generateMatrix
@@ -85,7 +85,7 @@ jobs:
       run: |
         make build
 
-    - name: Test
+    - name: Test Masna3 Server
       run: |
         set -x
         cabal install postgresql-migration
@@ -93,6 +93,14 @@ jobs:
         createdb -h "${MASNA3_DB_HOST}" -p "${MASNA3_DB_PORT}" -U "${MASNA3_DB_USER}" -w "${MASNA3_DB_DATABASE}"
         migrate init "${MASNA3_DB_CONNSTRING}"
         migrate migrate "${MASNA3_DB_CONNSTRING}" migrations
-        cabal test all
+        cabal test masna3-test
+      env:
+        PGPASSWORD: "postgres"
+
+    - name: Test Masna3 Jobs
+      run: |
+        set -x
+        source ./environment.ci.sh
+        cabal test background-jobs-test
       env:
         PGPASSWORD: "postgres"
