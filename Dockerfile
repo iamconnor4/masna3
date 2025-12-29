@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_VERSION=22.04
+ARG BASE_IMAGE_VERSION=24.04
 ARG GHC_VERSION=9.10.3
 ARG HLS_VERSION=2.11.0.0
 ARG CABAL_VERSION=3.14.1.1
@@ -24,10 +24,10 @@ RUN apt update \
         libgmp-dev \
         libgmp10 \
         libncurses-dev \
-        libncurses5 \
+        libncurses6 \
         libpq-dev \
         libsodium-dev \
-        libtinfo5 \
+        libtinfo6 \
         locales \
         pkg-config \
         postgresql-client \
@@ -98,6 +98,7 @@ RUN ghcup set ghc $GHC_VERSION
 RUN apt update
 RUN apt install -y libpq-dev wget tmux postgresql-client direnv
 
+RUN userdel -r ubuntu
 RUN groupadd -g "$GID" -o "$USER" \
     && useradd -l -r -u "$UID" -g "$GID" -m -s /bin/bash "$USER"
 
