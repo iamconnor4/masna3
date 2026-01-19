@@ -1,3 +1,4 @@
+import gleam/option.{None}
 import gleam/uri.{type Uri}
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
@@ -5,22 +6,11 @@ import lustre/element/html
 import modem
 
 // Local
+//import api/register_file as api_register_file
 import types
 import views/index
 import views/not_found
 import views/register_file
-
-pub fn update(
-  model: types.Model,
-  msg: types.Msg,
-) -> #(types.Model, Effect(types.Msg)) {
-  case msg {
-    types.UserNavigatedTo(route:) -> #(
-      types.Model(..model, route:),
-      effect.none(),
-    )
-  }
-}
 
 fn parse_route(uri: Uri) -> types.Route {
   case uri.path_segments(uri.path) {
@@ -36,7 +26,10 @@ pub fn init(_) -> #(types.Model, Effect(types.Msg)) {
     Error(_) -> types.Index
   }
 
-  let model = types.Model(route:)
+  let register_file_form =
+    types.FileRegistrationForm(file_name: "", mime_type: "", owner_id: "")
+
+  let model = types.Model(route:, register_file_form:, registered_file: None)
 
   let effect =
     modem.init(fn(uri) {
@@ -56,7 +49,7 @@ pub fn view(model: types.Model) -> Element(types.Msg) {
     html.main([], {
       case model.route {
         types.Index -> index.view()
-        types.RegisterFile -> register_file.view()
+        types.RegisterFile -> register_file.view(model)
         types.NotFound(_) -> not_found.view()
       }
     }),

@@ -1,6 +1,7 @@
 import lustre
 
-import router.{init, update, view}
+import router.{init, view}
+import update.{update}
 
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
