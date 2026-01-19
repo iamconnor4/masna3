@@ -108,6 +108,8 @@ library
     text,
     time,
     wai-log,
+    wai-cors,
+    http-types,
     warp,
 
   mixins:

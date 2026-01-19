@@ -14,6 +14,8 @@ import Masna3.Api
 import Masna3.Api.File
 import Network.Wai.Handler.Warp
 import Network.Wai.Log qualified as WaiLog
+import Network.Wai.Middleware.Cors
+import Network.HTTP.Types.Method (methodGet, methodPost, methodOptions)
 import Servant qualified
 import Servant.API (NamedRoutes)
 import Servant.Server
@@ -45,11 +47,21 @@ makeServer
   -> Masna3Env
   -> Application
 makeServer logger environment =
-  serveWithContextT
-    (Proxy @(NamedRoutes ServerRoutes))
-    (genBiscuitCtx environment.publicKey)
-    (handleRoute logger environment)
-    masna3Server
+  -- [!] TEMPORARILY ADDED CORS FOR GLEAM TESTING.
+  cors (\_req -> Just corsPolicy) $
+    serveWithContextT
+      (Proxy @(NamedRoutes ServerRoutes))
+      (genBiscuitCtx environment.publicKey)
+      (handleRoute logger environment)
+      masna3Server
+  
+  where
+      corsPolicy =
+        simpleCorsResourcePolicy
+        { corsOrigins = Nothing
+        , corsMethods = [methodGet, methodPost, methodOptions]
+        , corsRequestHeaders = [ "content-type" ]
+        }
 
 handleRoute
   :: Logger
