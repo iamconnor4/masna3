@@ -37,10 +37,10 @@ pub type Msg {
 }
 
 pub type RegisterFileMsg {
-  FileNameChanged(String)
-  MimeTypeChanged(String)
-  OwnerIdChanged(String)
-  Submitted
+  UserChangedFileName(String)
+  UserChangedMimeType(String)
+  UserChangedOwnerId(String)
+  UserSubmittedFileForm
   ApiReturnedRegisteredFile(Result(FileRegistrationResult, rsvp.Error))
 }
 

@@ -74,7 +74,7 @@ pub fn view(model: types.Model) -> List(Element(types.Msg)) {
           html.input([
             attribute.id("file_name"),
             event.on_input(fn(value) {
-              types.RegisterFileMsg(types.FileNameChanged(value))
+              types.RegisterFileMsg(types.UserChangedFileName(value))
             }),
           ]),
         ]),
@@ -83,7 +83,7 @@ pub fn view(model: types.Model) -> List(Element(types.Msg)) {
           html.input([
             attribute.id("mime_type"),
             event.on_input(fn(value) {
-              types.RegisterFileMsg(types.MimeTypeChanged(value))
+              types.RegisterFileMsg(types.UserChangedMimeType(value))
             }),
           ]),
         ]),
@@ -92,7 +92,7 @@ pub fn view(model: types.Model) -> List(Element(types.Msg)) {
           html.input([
             attribute.id("owner_id"),
             event.on_input(fn(value) {
-              types.RegisterFileMsg(types.OwnerIdChanged(value))
+              types.RegisterFileMsg(types.UserChangedOwnerId(value))
             }),
           ]),
         ]),
@@ -104,5 +104,5 @@ pub fn view(model: types.Model) -> List(Element(types.Msg)) {
 }
 
 fn handle_submit(_) -> types.Msg {
-  types.RegisterFileMsg(types.Submitted)
+  types.RegisterFileMsg(types.UserSubmittedFileForm)
 }

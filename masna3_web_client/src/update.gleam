@@ -26,25 +26,25 @@ fn handle_register_file(
   msg: types.RegisterFileMsg,
 ) -> #(types.Model, Effect(types.Msg)) {
   case msg {
-    types.FileNameChanged(v) -> {
+    types.UserChangedFileName(v) -> {
       let form =
         types.FileRegistrationForm(..model.register_file_form, file_name: v)
 
       #(types.Model(..model, register_file_form: form), effect.none())
     }
-    types.MimeTypeChanged(v) -> {
+    types.UserChangedMimeType(v) -> {
       let form =
         types.FileRegistrationForm(..model.register_file_form, mime_type: v)
 
       #(types.Model(..model, register_file_form: form), effect.none())
     }
-    types.OwnerIdChanged(v) -> {
+    types.UserChangedOwnerId(v) -> {
       let form =
         types.FileRegistrationForm(..model.register_file_form, owner_id: v)
 
       #(types.Model(..model, register_file_form: form), effect.none())
     }
-    types.Submitted -> #(
+    types.UserSubmittedFileForm -> #(
       model,
       effect.map(register_file(model.register_file_form), types.RegisterFileMsg),
     )
