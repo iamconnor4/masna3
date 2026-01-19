@@ -23,13 +23,10 @@ common common-extensions
     OverloadedRecordDot
     OverloadedStrings
     PackageImports
-    PolyKinds
     RecordWildCards
-    RequiredTypeArguments
     StrictData
     TypeFamilies
     UndecidableInstances
-    ViewPatterns
 
   default-language: GHC2024
 
