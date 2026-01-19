@@ -94,6 +94,7 @@ library
     effectful-core,
     effectful-postgresql,
     envparse,
+    http-types,
     log-base,
     log-effectful,
     masna3-api,
@@ -107,9 +108,8 @@ library
     servant-server,
     text,
     time,
-    wai-log,
     wai-cors,
-    http-types,
+    wai-log,
     warp,
 
   mixins:
