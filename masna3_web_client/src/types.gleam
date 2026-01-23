@@ -1,5 +1,6 @@
 import gleam/option.{type Option}
 import gleam/uri
+
 import lustre/attribute.{type Attribute}
 import rsvp
 

@@ -1,12 +1,12 @@
 import gleam/option.{None}
 import gleam/uri.{type Uri}
+
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import modem
 
-// Local
-//import api/register_file as api_register_file
+import components/navbar
 import types
 import views/index
 import views/not_found
@@ -43,9 +43,7 @@ pub fn init(_) -> #(types.Model, Effect(types.Msg)) {
 
 pub fn view(model: types.Model) -> Element(types.Msg) {
   html.div([], [
-    html.nav([], [
-      html.a([types.href(types.Index)], [html.text("Masna3 Web Client")]),
-    ]),
+    navbar.view(),
     html.main([], {
       case model.route {
         types.Index -> index.view()
