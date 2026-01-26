@@ -11,7 +11,7 @@ pub type Msg {
   UserChangedFileName(String)
   UserChangedMimeType(String)
   UserChangedOwnerId(String)
-  UserSubmittedFileForm
+  UserSubmittedForm
   ApiReturnedRegisteredFile(Result(FileRegistrationResult, rsvp.Error))
 }
 
@@ -74,7 +74,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 
       #(Model(..model, register_file_form: form), effect.none())
     }
-    UserSubmittedFileForm -> #(model, send(model.register_file_form))
+    UserSubmittedForm -> #(model, send(model.register_file_form))
     ApiReturnedRegisteredFile(Ok(registered_file)) -> #(
       Model(..model, registered_file: Some(Ok(registered_file))),
       effect.none(),

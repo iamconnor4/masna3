@@ -7,7 +7,7 @@ import lustre/event
 
 import domain/register_file.{
   FileRegistrationResult, UserChangedFileName, UserChangedMimeType,
-  UserChangedOwnerId, UserSubmittedFileForm,
+  UserChangedOwnerId, UserSubmittedForm,
 }
 import types/model.{type Model}
 import types/msg.{type Msg, RegisterFileMsg}
@@ -66,5 +66,5 @@ pub fn view(model: Model) -> List(Element(Msg)) {
 }
 
 fn handle_submit(_) -> Msg {
-  RegisterFileMsg(UserSubmittedFileForm)
+  RegisterFileMsg(UserSubmittedForm)
 }
