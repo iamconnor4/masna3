@@ -57,7 +57,7 @@ makeServer logger environment =
   where
     corsPolicy =
       simpleCorsResourcePolicy
-        { corsOrigins = Nothing
+        { corsOrigins = Just (["http://localhost:1234"], True)
         , corsMethods = [methodGet, methodPost, methodOptions]
         , corsRequestHeaders = ["content-type"]
         }
