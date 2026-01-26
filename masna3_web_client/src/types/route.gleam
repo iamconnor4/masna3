@@ -5,6 +5,7 @@ import lustre/attribute.{type Attribute}
 pub type Route {
   Index
   RegisterFile
+  ConfirmFile
   NotFound(uri: uri.Uri)
 }
 
@@ -15,6 +16,7 @@ pub fn href(route: Route) -> Attribute(msg) {
   let url = case route {
     Index -> "/"
     RegisterFile -> "/register_file"
+    ConfirmFile -> "/confirm_file"
     NotFound(_) -> "/404"
   }
 
