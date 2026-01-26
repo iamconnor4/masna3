@@ -1,4 +1,3 @@
-import gleam/option.{None}
 import gleam/uri.{type Uri}
 
 import lustre/effect.{type Effect}
@@ -6,49 +5,50 @@ import lustre/element.{type Element}
 import lustre/element/html
 import modem
 
+import domain/register_file
+import types/model.{type Model, Model}
+import types/msg.{type Msg, UserNavigatedTo}
+import types/route.{type Route}
+
 import components/navbar
-import types
+import views/file/register_file as register_file_view
 import views/index
 import views/not_found
-import views/register_file
 
-fn parse_route(uri: Uri) -> types.Route {
+fn parse_route(uri: Uri) -> Route {
   case uri.path_segments(uri.path) {
-    [] | [""] -> types.Index
-    ["register_file"] -> types.RegisterFile
-    _ -> types.NotFound(uri:)
+    [] | [""] -> route.Index
+    ["register_file"] -> route.RegisterFile
+    _ -> route.NotFound(uri:)
   }
 }
 
-pub fn init(_) -> #(types.Model, Effect(types.Msg)) {
+pub fn init(_) -> #(Model, Effect(Msg)) {
   let route = case modem.initial_uri() {
     Ok(uri) -> parse_route(uri)
-    Error(_) -> types.Index
+    Error(_) -> route.Index
   }
 
-  let register_file_form =
-    types.FileRegistrationForm(file_name: "", mime_type: "", owner_id: "")
-
-  let model = types.Model(route:, register_file_form:, registered_file: None)
+  let model = Model(route:, register_file: register_file.init())
 
   let effect =
     modem.init(fn(uri) {
       uri
       |> parse_route
-      |> types.UserNavigatedTo
+      |> UserNavigatedTo
     })
 
   #(model, effect)
 }
 
-pub fn view(model: types.Model) -> Element(types.Msg) {
+pub fn view(model: Model) -> Element(Msg) {
   html.div([], [
     navbar.view(),
     html.main([], {
       case model.route {
-        types.Index -> index.view()
-        types.RegisterFile -> register_file.view(model)
-        types.NotFound(_) -> not_found.view()
+        route.Index -> index.view()
+        route.RegisterFile -> register_file_view.view(model)
+        route.NotFound(_) -> not_found.view()
       }
     }),
   ])

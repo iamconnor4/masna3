@@ -5,16 +5,22 @@ import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 
-import components/error
-import types
+import domain/register_file.{
+  FileRegistrationResult, UserChangedFileName, UserChangedMimeType,
+  UserChangedOwnerId, UserSubmittedFileForm,
+}
+import types/model.{type Model}
+import types/msg.{type Msg, RegisterFileMsg}
 
-pub fn view(model: types.Model) -> List(Element(types.Msg)) {
+import components/error
+
+pub fn view(model: Model) -> List(Element(Msg)) {
   [
     html.div([], [
       html.h2([], [html.text("Register File")]),
 
-      case model.registered_file {
-        Some(Ok(types.FileRegistrationResult(file_id, url))) ->
+      case model.register_file.registered_file {
+        Some(Ok(FileRegistrationResult(file_id, url))) ->
           html.div([], [
             html.h3([], [html.text("File registered")]),
             html.p([], [html.text("File ID: " <> file_id)]),
@@ -30,7 +36,7 @@ pub fn view(model: types.Model) -> List(Element(types.Msg)) {
           html.input([
             attribute.id("file_name"),
             event.on_input(fn(value) {
-              types.RegisterFileMsg(types.UserChangedFileName(value))
+              RegisterFileMsg(UserChangedFileName(value))
             }),
           ]),
         ]),
@@ -39,7 +45,7 @@ pub fn view(model: types.Model) -> List(Element(types.Msg)) {
           html.input([
             attribute.id("mime_type"),
             event.on_input(fn(value) {
-              types.RegisterFileMsg(types.UserChangedMimeType(value))
+              RegisterFileMsg(UserChangedMimeType(value))
             }),
           ]),
         ]),
@@ -48,7 +54,7 @@ pub fn view(model: types.Model) -> List(Element(types.Msg)) {
           html.input([
             attribute.id("owner_id"),
             event.on_input(fn(value) {
-              types.RegisterFileMsg(types.UserChangedOwnerId(value))
+              RegisterFileMsg(UserChangedOwnerId(value))
             }),
           ]),
         ]),
@@ -59,6 +65,6 @@ pub fn view(model: types.Model) -> List(Element(types.Msg)) {
   ]
 }
 
-fn handle_submit(_) -> types.Msg {
-  types.RegisterFileMsg(types.UserSubmittedFileForm)
+fn handle_submit(_) -> Msg {
+  RegisterFileMsg(UserSubmittedFileForm)
 }

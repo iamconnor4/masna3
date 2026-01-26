@@ -1,14 +1,15 @@
 import lustre/element.{type Element}
 import lustre/element/html
 
-import types
+import types/msg.{type Msg}
+import types/route
 
-pub fn view() -> List(Element(types.Msg)) {
+pub fn view() -> List(Element(Msg)) {
   [
     html.p([], [html.text("Index page")]),
     html.ul([], [
       html.li([], [
-        html.a([types.href(types.RegisterFile)], [html.text("Register File")]),
+        html.a([route.href(route.RegisterFile)], [html.text("Register File")]),
       ]),
     ]),
   ]

@@ -2,10 +2,11 @@ import lustre/element.{type Element}
 import lustre/element/html
 
 import config
-import types
+import types/msg.{type Msg}
+import types/route
 
-pub fn view() -> Element(types.Msg) {
+pub fn view() -> Element(Msg) {
   html.nav([], [
-    html.a([types.href(types.Index)], [html.text(config.app_name)]),
+    html.a([route.href(route.Index)], [html.text(config.app_name)]),
   ])
 }

@@ -6,9 +6,9 @@ import lustre/element.{type Element}
 import lustre/element/html
 import rsvp
 
-import types
+import types/msg.{type Msg}
 
-pub fn view(err: rsvp.Error, context: String) -> Element(types.Msg) {
+pub fn view(err: rsvp.Error, context: String) -> Element(Msg) {
   html.div([], [
     html.h3([], [html.text(context)]),
     case err {
