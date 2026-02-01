@@ -23,10 +23,6 @@ pub type Model {
   )
 }
 
-pub type FileRegistrationResult {
-  FileRegistrationResult(file_id: String, url: String)
-}
-
 pub fn send(file_id: FileId) -> Effect(Msg) {
   let FileId(id) = file_id
   let url = config.api_base_url <> "/files/" <> id <> "/confirm"
@@ -49,8 +45,8 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       #(Model(..model, file_id:), effect.none())
     }
     UserSubmittedForm -> #(model, send(model.file_id))
-    ApiReturnedConfirmedFile(Ok(registered_file)) -> #(
-      Model(..model, confirmed_file_response: Some(Ok(registered_file))),
+    ApiReturnedConfirmedFile(Ok(confirmed_file)) -> #(
+      Model(..model, confirmed_file_response: Some(Ok(confirmed_file))),
       effect.none(),
     )
     ApiReturnedConfirmedFile(Error(err)) -> #(

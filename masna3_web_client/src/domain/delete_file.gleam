@@ -21,10 +21,6 @@ pub type Model {
   )
 }
 
-pub type FileDeletionResult {
-  FileDeletionResult(file_id: String, url: String)
-}
-
 pub fn send(file_id: FileId) -> Effect(Msg) {
   let FileId(id) = file_id
   let url = config.api_base_url <> "/files/" <> id <> "/delete"
