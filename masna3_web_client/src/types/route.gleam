@@ -6,6 +6,7 @@ pub type Route {
   Index
   RegisterFile
   ConfirmFile
+  DeleteFile
   NotFound(uri: uri.Uri)
 }
 
@@ -17,6 +18,7 @@ pub fn href(route: Route) -> Attribute(msg) {
     Index -> "/"
     RegisterFile -> "/register_file"
     ConfirmFile -> "/confirm_file"
+    DeleteFile -> "/delete_file"
     NotFound(_) -> "/404"
   }
 

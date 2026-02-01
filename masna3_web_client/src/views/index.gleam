@@ -14,6 +14,9 @@ pub fn view() -> List(Element(Msg)) {
       html.li([], [
         html.a([route.href(route.ConfirmFile)], [html.text("Confirm File")]),
       ]),
+      html.li([], [
+        html.a([route.href(route.DeleteFile)], [html.text("Delete File")]),
+      ]),
     ]),
   ]
 }

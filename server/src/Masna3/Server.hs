@@ -12,7 +12,7 @@ import Effectful.Time
 import Log (Logger)
 import Masna3.Api
 import Masna3.Api.File
-import Network.HTTP.Types.Method (methodGet, methodOptions, methodPost)
+import Network.HTTP.Types.Method (methodDelete, methodGet, methodOptions, methodPost)
 import Network.Wai.Handler.Warp
 import Network.Wai.Log qualified as WaiLog
 import Network.Wai.Middleware.Cors
@@ -58,7 +58,7 @@ makeServer logger environment =
     corsPolicy =
       simpleCorsResourcePolicy
         { corsOrigins = Just (["http://localhost:1234"], True)
-        , corsMethods = [methodGet, methodPost, methodOptions]
+        , corsMethods = [methodGet, methodPost, methodDelete, methodOptions]
         , corsRequestHeaders = ["content-type"]
         }
 

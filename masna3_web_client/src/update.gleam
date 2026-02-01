@@ -1,9 +1,12 @@
 import lustre/effect.{type Effect}
 
 import domain/confirm_file
+import domain/delete_file
 import domain/register_file
 import types/model.{type Model, Model}
-import types/msg.{type Msg, ConfirmFileMsg, RegisterFileMsg, UserNavigatedTo}
+import types/msg.{
+  type Msg, ConfirmFileMsg, DeleteFileMsg, RegisterFileMsg, UserNavigatedTo,
+}
 
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
@@ -28,6 +31,16 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       #(
         Model(..model, confirm_file: new_confirm_file_model),
         effect.map(confirm_file_effect, ConfirmFileMsg),
+      )
+    }
+
+    DeleteFileMsg(delete_msg) -> {
+      let #(new_delete_file_model, delete_file_effect) =
+        delete_file.update(model.delete_file, delete_msg)
+
+      #(
+        Model(..model, delete_file: new_delete_file_model),
+        effect.map(delete_file_effect, DeleteFileMsg),
       )
     }
   }
