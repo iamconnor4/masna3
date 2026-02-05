@@ -11,12 +11,18 @@ import domain/confirm_file.{UserChangedFileId, UserSubmittedForm}
 import types/model.{type Model}
 import types/msg.{type Msg, ConfirmFileMsg}
 
-import components/error
+import components/rsvp_error
+import components/validation_error
 
 pub fn view(model: Model) -> List(Element(Msg)) {
   [
     html.div([], [
       html.h2([], [html.text("Confirm File")]),
+
+      case list.is_empty(model.confirm_file.validation_errors) {
+        True -> element.none()
+        False -> validation_error.view(model.confirm_file.validation_errors)
+      },
 
       case model.confirm_file.confirmed_file_response {
         Some(Ok(s)) ->
@@ -34,8 +40,8 @@ pub fn view(model: Model) -> List(Element(Msg)) {
                 }),
             ),
           ])
-        Some(Error(err)) -> error.view(err, "File not confirmed")
-        None -> html.div([], [])
+        Some(Error(err)) -> rsvp_error.view(err, "File not confirmed")
+        None -> element.none()
       },
 
       html.form([event.on_submit(handle_submit)], [

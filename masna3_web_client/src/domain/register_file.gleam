@@ -6,6 +6,7 @@ import lustre/effect.{type Effect}
 import rsvp
 
 import config
+import validation.{type ValidationError}
 
 pub type Msg {
   UserChangedFileName(String)
@@ -18,6 +19,7 @@ pub type Msg {
 pub type Model {
   Model(
     register_file_form: FileRegistrationForm,
+    validation_errors: List(ValidationError),
     registered_file: Option(Result(FileRegistrationResult, rsvp.Error)),
   )
 }
@@ -54,7 +56,7 @@ pub fn init() -> Model {
   let register_file_form =
     FileRegistrationForm(file_name: "", mime_type: "", owner_id: "")
 
-  Model(register_file_form:, registered_file: None)
+  Model(register_file_form:, registered_file: None, validation_errors: [])
 }
 
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -74,7 +76,14 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 
       #(Model(..model, register_file_form: form), effect.none())
     }
-    UserSubmittedForm -> #(model, send(model.register_file_form))
+    UserSubmittedForm -> {
+      let validation_errors = validate(model.register_file_form)
+      let new_model = Model(..model, validation_errors:, registered_file: None)
+      case validation_errors {
+        [] -> #(new_model, send(new_model.register_file_form))
+        _ -> #(new_model, effect.none())
+      }
+    }
     ApiReturnedRegisteredFile(Ok(registered_file)) -> #(
       Model(..model, registered_file: Some(Ok(registered_file))),
       effect.none(),
@@ -84,4 +93,9 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       effect.none(),
     )
   }
+}
+
+fn validate(form: FileRegistrationForm) -> List(ValidationError) {
+  [validation.validate_uuid(form.owner_id)]
+  |> option.values()
 }

@@ -7,6 +7,7 @@ import rsvp
 
 import config
 import types/domain.{type FileId, FileId}
+import validation.{type ValidationError}
 
 pub type Msg {
   UserChangedFileId(String)
@@ -17,6 +18,7 @@ pub type Msg {
 pub type Model {
   Model(
     file_id: FileId,
+    validation_errors: List(ValidationError),
     confirmed_file_response: Option(
       Result(response.Response(String), rsvp.Error),
     ),
@@ -34,7 +36,7 @@ pub fn send(file_id: FileId) -> Effect(Msg) {
 pub fn init() -> Model {
   let file_id = FileId("")
 
-  Model(file_id:, confirmed_file_response: None)
+  Model(file_id:, confirmed_file_response: None, validation_errors: [])
 }
 
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -44,7 +46,15 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 
       #(Model(..model, file_id:), effect.none())
     }
-    UserSubmittedForm -> #(model, send(model.file_id))
+    UserSubmittedForm -> {
+      let validation_errors = validate(model.file_id)
+      let new_model =
+        Model(..model, validation_errors:, confirmed_file_response: None)
+      case validation_errors {
+        [] -> #(new_model, send(new_model.file_id))
+        _ -> #(new_model, effect.none())
+      }
+    }
     ApiReturnedConfirmedFile(Ok(confirmed_file)) -> #(
       Model(..model, confirmed_file_response: Some(Ok(confirmed_file))),
       effect.none(),
@@ -54,4 +64,11 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       effect.none(),
     )
   }
+}
+
+fn validate(file_id: FileId) -> List(ValidationError) {
+  let FileId(file_id_string) = file_id
+
+  [validation.validate_uuid(file_id_string)]
+  |> option.values()
 }

@@ -11,12 +11,18 @@ import domain/delete_file.{UserChangedFileId, UserSubmittedForm}
 import types/model.{type Model}
 import types/msg.{type Msg, DeleteFileMsg}
 
-import components/error
+import components/rsvp_error
+import components/validation_error
 
 pub fn view(model: Model) -> List(Element(Msg)) {
   [
     html.div([], [
       html.h2([], [html.text("Delete File")]),
+
+      case list.is_empty(model.delete_file.validation_errors) {
+        True -> element.none()
+        False -> validation_error.view(model.delete_file.validation_errors)
+      },
 
       case model.delete_file.delete_file_response {
         Some(Ok(s)) ->
@@ -34,8 +40,8 @@ pub fn view(model: Model) -> List(Element(Msg)) {
                 }),
             ),
           ])
-        Some(Error(err)) -> error.view(err, "File not deleted")
-        None -> html.div([], [])
+        Some(Error(err)) -> rsvp_error.view(err, "File not deleted")
+        None -> element.none()
       },
 
       html.form([event.on_submit(handle_submit)], [

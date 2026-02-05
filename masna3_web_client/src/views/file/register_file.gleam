@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/option.{None, Some}
 
 import lustre/attribute
@@ -12,12 +13,18 @@ import domain/register_file.{
 import types/model.{type Model}
 import types/msg.{type Msg, RegisterFileMsg}
 
-import components/error
+import components/rsvp_error
+import components/validation_error
 
 pub fn view(model: Model) -> List(Element(Msg)) {
   [
     html.div([], [
       html.h2([], [html.text("Register File")]),
+
+      case list.is_empty(model.register_file.validation_errors) {
+        True -> html.div([], [])
+        False -> validation_error.view(model.register_file.validation_errors)
+      },
 
       case model.register_file.registered_file {
         Some(Ok(FileRegistrationResult(file_id, url))) ->
@@ -26,7 +33,7 @@ pub fn view(model: Model) -> List(Element(Msg)) {
             html.p([], [html.text("File ID: " <> file_id)]),
             html.p([], [html.text("URL: " <> url)]),
           ])
-        Some(Error(err)) -> error.view(err, "File not registered")
+        Some(Error(err)) -> rsvp_error.view(err, "File not registered")
         None -> html.div([], [])
       },
 
