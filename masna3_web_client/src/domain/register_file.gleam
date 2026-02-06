@@ -96,6 +96,9 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 }
 
 fn validate(form: FileRegistrationForm) -> List(ValidationError) {
-  [validation.validate_uuid(form.owner_id)]
+  [
+    validation.validate_uuid(form.owner_id),
+    validation.validate_mime_type(form.mime_type),
+  ]
   |> option.values()
 }
