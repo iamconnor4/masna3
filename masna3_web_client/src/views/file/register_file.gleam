@@ -22,7 +22,7 @@ pub fn view(model: Model) -> List(Element(Msg)) {
       html.h2([], [html.text("Register File")]),
 
       case list.is_empty(model.register_file.validation_errors) {
-        True -> html.div([], [])
+        True -> element.none()
         False -> validation_error.view(model.register_file.validation_errors)
       },
 
@@ -34,7 +34,7 @@ pub fn view(model: Model) -> List(Element(Msg)) {
             html.p([], [html.text("URL: " <> url)]),
           ])
         Some(Error(err)) -> rsvp_error.view(err, "File not registered")
-        None -> html.div([], [])
+        None -> element.none()
       },
 
       html.form([event.on_submit(handle_submit)], [
