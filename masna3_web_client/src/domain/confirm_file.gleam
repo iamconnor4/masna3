@@ -19,9 +19,7 @@ pub type Model {
   Model(
     file_id: FileId,
     validation_errors: List(ValidationError),
-    confirmed_file_response: Option(
-      Result(response.Response(String), rsvp.Error),
-    ),
+    confirm_file_response: Option(Result(response.Response(String), rsvp.Error)),
   )
 }
 
@@ -36,7 +34,7 @@ pub fn send(file_id: FileId) -> Effect(Msg) {
 pub fn init() -> Model {
   let file_id = FileId("")
 
-  Model(file_id:, confirmed_file_response: None, validation_errors: [])
+  Model(file_id:, confirm_file_response: None, validation_errors: [])
 }
 
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -49,18 +47,18 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     UserSubmittedForm -> {
       let validation_errors = validate(model.file_id)
       let new_model =
-        Model(..model, validation_errors:, confirmed_file_response: None)
+        Model(..model, validation_errors:, confirm_file_response: None)
       case validation_errors {
         [] -> #(new_model, send(new_model.file_id))
         _ -> #(new_model, effect.none())
       }
     }
     ApiReturnedConfirmedFile(Ok(confirmed_file)) -> #(
-      Model(..model, confirmed_file_response: Some(Ok(confirmed_file))),
+      Model(..model, confirm_file_response: Some(Ok(confirmed_file))),
       effect.none(),
     )
     ApiReturnedConfirmedFile(Error(err)) -> #(
-      Model(..model, confirmed_file_response: Some(Error(err))),
+      Model(..model, confirm_file_response: Some(Error(err))),
       effect.none(),
     )
   }

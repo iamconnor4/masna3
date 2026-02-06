@@ -20,7 +20,7 @@ pub type Model {
   Model(
     register_file_form: FileRegistrationForm,
     validation_errors: List(ValidationError),
-    registered_file: Option(Result(FileRegistrationResult, rsvp.Error)),
+    register_file_response: Option(Result(FileRegistrationResult, rsvp.Error)),
   )
 }
 
@@ -56,7 +56,11 @@ pub fn init() -> Model {
   let register_file_form =
     FileRegistrationForm(file_name: "", mime_type: "", owner_id: "")
 
-  Model(register_file_form:, registered_file: None, validation_errors: [])
+  Model(
+    register_file_form:,
+    register_file_response: None,
+    validation_errors: [],
+  )
 }
 
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -78,18 +82,19 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     }
     UserSubmittedForm -> {
       let validation_errors = validate(model.register_file_form)
-      let new_model = Model(..model, validation_errors:, registered_file: None)
+      let new_model =
+        Model(..model, validation_errors:, register_file_response: None)
       case validation_errors {
         [] -> #(new_model, send(new_model.register_file_form))
         _ -> #(new_model, effect.none())
       }
     }
     ApiReturnedRegisteredFile(Ok(registered_file)) -> #(
-      Model(..model, registered_file: Some(Ok(registered_file))),
+      Model(..model, register_file_response: Some(Ok(registered_file))),
       effect.none(),
     )
     ApiReturnedRegisteredFile(Error(err)) -> #(
-      Model(..model, registered_file: Some(Error(err))),
+      Model(..model, register_file_response: Some(Error(err))),
       effect.none(),
     )
   }

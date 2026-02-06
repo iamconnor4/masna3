@@ -26,7 +26,7 @@ pub fn view(model: Model) -> List(Element(Msg)) {
         False -> validation_error.view(model.register_file.validation_errors)
       },
 
-      case model.register_file.registered_file {
+      case model.register_file.register_file_response {
         Some(Ok(FileRegistrationResult(file_id, url))) ->
           html.div([], [
             html.h3([], [html.text("File registered")]),

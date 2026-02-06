@@ -24,7 +24,7 @@ pub fn view(model: Model) -> List(Element(Msg)) {
         False -> validation_error.view(model.confirm_file.validation_errors)
       },
 
-      case model.confirm_file.confirmed_file_response {
+      case model.confirm_file.confirm_file_response {
         Some(Ok(s)) ->
           html.div([], [
             html.h3([], [html.text("File confirmed")]),
