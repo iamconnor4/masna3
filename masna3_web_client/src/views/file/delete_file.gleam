@@ -21,20 +21,29 @@ pub fn view(model: Model) -> List(Element(Msg)) {
       },
       case model.delete_file.delete_file_response {
         Some(Ok(s)) ->
-          html.div([], [
-            html.h3([], [html.text("File deleted")]),
-            html.p([], [html.text("Status: " <> int.to_string(s.status))]),
-            html.p([], [html.text("Body: " <> s.body)]),
-            html.p([], [html.text("Headers:")]),
-            html.ul(
-              [],
-              s.headers
-                |> list.map(fn(pair) {
-                  let #(header, value) = pair
-                  html.li([], [html.text(header <> " : " <> value)])
-                }),
-            ),
-          ])
+          html.div(
+            [
+              attribute.class(
+                "w-150 mb-2 p-3 border border-green-400 rounded-md bg-green-100",
+              ),
+            ],
+            [
+              html.h3([attribute.class("underline text-center")], [
+                html.text("File deleted"),
+              ]),
+              html.p([], [html.text("Status: " <> int.to_string(s.status))]),
+              html.p([], [html.text("Body: " <> s.body)]),
+              html.p([], [html.text("Headers:")]),
+              html.ul(
+                [],
+                s.headers
+                  |> list.map(fn(pair) {
+                    let #(header, value) = pair
+                    html.li([], [html.text(header <> " : " <> value)])
+                  }),
+              ),
+            ],
+          )
         Some(Error(err)) -> rsvp_error.view(err, "File not deleted")
         None -> element.none()
       },

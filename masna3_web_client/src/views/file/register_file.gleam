@@ -23,11 +23,20 @@ pub fn view(model: Model) -> List(Element(Msg)) {
       },
       case model.register_file.register_file_response {
         Some(Ok(FileRegistrationResult(file_id, url))) ->
-          html.div([], [
-            html.h3([], [html.text("File registered")]),
-            html.p([], [html.text("File ID: " <> file_id)]),
-            html.p([], [html.text("URL: " <> url)]),
-          ])
+          html.div(
+            [
+              attribute.class(
+                "w-240 mb-2 p-3 border border-green-400 rounded-md bg-green-100",
+              ),
+            ],
+            [
+              html.h3([attribute.class("underline text-center")], [
+                html.text("File registered"),
+              ]),
+              html.p([], [html.text("File ID: " <> file_id)]),
+              html.p([], [html.text("URL: " <> url)]),
+            ],
+          )
         Some(Error(err)) -> rsvp_error.view(err, "File not registered")
         None -> element.none()
       },
