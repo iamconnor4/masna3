@@ -62,6 +62,7 @@ data Masna3Config = Masna3Config
   , awsSecret :: AWS.Sensitive AWS.SecretKey
   , awsRegion :: Region
   , awsBucket :: BucketName
+  , allowedOrigins :: [ByteString]
   }
   deriving stock (Generic, Show)
 
@@ -126,6 +127,9 @@ parseSecretKeyFromEnv :: Parser Error SecretKey
 parseSecretKeyFromEnv =
   var readSecretKey "MASNA3_SECRET_KEY" (help "Secret key for Biscuit authorisation")
 
+parseAllowedOrigins :: Parser Error [ByteString]
+parseAllowedOrigins = var parseByteStringList "MASNA3_ALLOWED_ORIGINS" (help "Allowed origins for CORS")
+
 parseConfig :: Parser Error Masna3Config
 parseConfig =
   Masna3Config
@@ -141,6 +145,7 @@ parseConfig =
     <*> var nonempty "MASNA3_AWS_SECRET_KEY" (help "AWS Secret Key")
     <*> var nonempty "MASNA3_AWS_REGION" (help "AWS Region")
     <*> var nonempty "MASNA3_AWS_BUCKET" (help "AWS Bucket")
+    <*> parseAllowedOrigins
 
 parseTestConfig :: Parser Error TestConfig
 parseTestConfig =
@@ -164,6 +169,9 @@ port p = case int p of
     if intPort >= 1 && intPort <= 65535
       then Right $ fromIntegral intPort
       else Left . unread $ p
+
+parseByteStringList :: Reader Error [ByteString]
+parseByteStringList = (fmap . fmap) BS8.pack . splitOn ','
 
 parseBool :: Reader Error Bool
 parseBool p = case Text.toLower (Text.pack p) of

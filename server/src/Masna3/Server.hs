@@ -47,7 +47,6 @@ makeServer
   -> Masna3Env
   -> Application
 makeServer logger environment =
-  -- [!] TEMPORARILY ADDED CORS FOR GLEAM TESTING.
   cors (\_req -> Just corsPolicy) $
     serveWithContextT
       (Proxy @(NamedRoutes ServerRoutes))
@@ -57,9 +56,10 @@ makeServer logger environment =
   where
     corsPolicy =
       simpleCorsResourcePolicy
-        { corsOrigins = Just (["http://localhost:1234"], True)
+        { corsOrigins = Just (environment.allowedOrigins, True)
         , corsMethods = [methodGet, methodPost, methodDelete, methodOptions]
         , corsRequestHeaders = ["content-type"]
+        , corsMaxAge = Just 3600
         }
 
 handleRoute
