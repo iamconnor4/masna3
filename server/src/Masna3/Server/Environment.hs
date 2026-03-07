@@ -3,7 +3,7 @@ module Masna3.Server.Environment where
 import Amazonka
 import Amazonka.S3.Internal (BucketName)
 import Auth.Biscuit (PublicKey)
-import Data.ByteString (ByteString, StrictByteString)
+import Data.ByteString (StrictByteString)
 import Data.Pool (Pool)
 import Data.Pool qualified as Pool
 import Data.Time
@@ -27,7 +27,7 @@ data Masna3Env = Masna3Env
   , s3AuthEnv :: AuthEnv
   , awsRegion :: Region
   , awsBucket :: BucketName
-  , allowedOrigins :: [ByteString]
+  , allowedOrigins :: [StrictByteString]
   }
   deriving stock (Generic)
 
