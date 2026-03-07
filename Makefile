@@ -7,7 +7,7 @@ start: ## Start the masna3 server
 build: ## Build the project
 	@cabal build all
 
-clean: ## Remove compilation artifacts
+clean: gleam-clean ## Remove compilation artifacts
 	@cabal clean
 
 repl: ## Start a REPL
@@ -37,6 +37,15 @@ style-quick: ## Run the code stylers are changed files
 
 tags: ## Generate ctags for the project with `ghc-tags`
 	@ghc-tags -c api server
+
+gleam-start: ## Start a development server for the web client.
+	@cd masna3_web_client ; gleam run -m lustre/dev start
+
+gleam-build: ## Build the web client into a deployable SPA
+	@cd masna3_web_client ; gleam run -m lustre/dev build --minify
+
+gleam-clean: ## Clean build artifacts
+	@cd masna3_web_client ; gleam clean
 
 docker-build: ## Build and start the container cluster
 	@docker compose build devel

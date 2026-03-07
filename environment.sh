@@ -41,5 +41,7 @@ export MASNA3_AWS_SECRET_KEY="fake-id"
 export MASNA3_AWS_REGION="Paris"
 
 export MASNA3_AWS_BUCKET="masna3-dev"
+# Allowed Origins for CORS
+export MASNA3_ALLOWED_ORIGINS="http://localhost:1234"
 
 export DOCKER_BUILDKIT=1

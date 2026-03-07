@@ -27,6 +27,7 @@ data Masna3Env = Masna3Env
   , s3AuthEnv :: AuthEnv
   , awsRegion :: Region
   , awsBucket :: BucketName
+  , allowedOrigins :: [StrictByteString]
   }
   deriving stock (Generic)
 
@@ -64,6 +65,7 @@ configToEnv masna3Config = do
       , s3AuthEnv
       , awsRegion = masna3Config.awsRegion
       , awsBucket = masna3Config.awsBucket
+      , allowedOrigins = masna3Config.allowedOrigins
       }
 
 getMasna3Env :: IOE :> es => Eff es Masna3Env
