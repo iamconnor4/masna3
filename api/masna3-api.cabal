@@ -57,6 +57,9 @@ library
     Masna3.Api.File
     Masna3.Api.File.FileId
     Masna3.Api.Owner.OwnerId
+    Masna3.Api.Process
+    Masna3.Api.Process.ProcessId
+    Masna3.Api.ProcessFile.ProcessFileId
 
   build-depends:
     aeson,
