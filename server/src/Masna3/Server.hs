@@ -25,8 +25,8 @@ import Servant.Server.Generic
 import Masna3.Server.Effects
 import Masna3.Server.Environment
 import Masna3.Server.Error
-import Masna3.Server.File qualified as File
-import Masna3.Server.Process qualified as Process
+import Masna3.Server.File.Handler qualified as File
+import Masna3.Server.Process.Handler qualified as Process
 
 runMasna3
   :: IOE :> es

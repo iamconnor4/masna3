@@ -1,4 +1,4 @@
-module Masna3.Server.Process where
+module Masna3.Server.Process.Handler where
 
 import Effectful
 import Masna3.Api.Process
@@ -7,7 +7,8 @@ import Servant.API.ContentTypes
 
 import Masna3.Server.Database
 import Masna3.Server.Effects
-import Masna3.Server.Guards
+import Masna3.Server.Process.Guards
+import Masna3.Server.Owner.Guards
 import Masna3.Server.Model.Process.Types
 import Masna3.Server.Model.Process.Update qualified as Update
 

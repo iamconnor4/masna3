@@ -66,8 +66,11 @@ library
     Masna3.Server.Effects
     Masna3.Server.Environment
     Masna3.Server.Error
-    Masna3.Server.File
-    Masna3.Server.Guards
+    Masna3.Server.File.Handler
+    Masna3.Server.File.Guards
+    Masna3.Server.Process.Handler
+    Masna3.Server.Process.Guards
+    Masna3.Server.Owner.Guards
     Masna3.Server.Jobs.Types
     Masna3.Server.Model.File.Query
     Masna3.Server.Model.File.Types
@@ -81,7 +84,6 @@ library
     Masna3.Server.Model.ProcessFile.Query
     Masna3.Server.Model.ProcessFile.Types
     Masna3.Server.Model.ProcessFile.Update
-    Masna3.Server.Process
 
   build-depends:
     aeson,

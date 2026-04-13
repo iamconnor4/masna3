@@ -1,4 +1,4 @@
-module Masna3.Server.File where
+module Masna3.Server.File.Handler where
 
 import Data.Aeson
 import Data.Text.Encoding qualified as Text
@@ -16,7 +16,9 @@ import Masna3.Server.Database
 import Masna3.Server.Effects
 import Masna3.Server.Environment
 import Masna3.Server.Error
-import Masna3.Server.Guards
+import Masna3.Server.File.Guards
+import Masna3.Server.Process.Guards
+import Masna3.Server.Owner.Guards
 import Masna3.Server.Model.File.Types
 import Masna3.Server.Model.File.Update qualified as Update
 import Masna3.Server.Model.ProcessFile.Types (newProcessFile)
