@@ -6,7 +6,8 @@ import Masna3.Api.Process
 import Test.Tasty
 
 import Masna3.Server.Model.Owner.Types
-import Masna3.Server.Model.Owner.Update qualified as Update
+import Masna3.Server.Model.Owner.Update qualified as OwnerUpdate
+import Masna3.Server.Model.Process.Query qualified as ProcessQuery
 import Masna3.Test.Utils
 
 spec :: TestEnv -> TestTree
@@ -22,12 +23,14 @@ spec env =
     , testThis env "Complete process with 2 files" testCompleteProcessWith2Files
     , testThis env "Cancel process with 1 file" testCancelProcessWith1File
     , testThis env "Cancel process with 2 files" testCancelProcessWith2Files
+    , testThis env "Has unconfirmed files pending" testHasUnconfirmedFilesPending
+    , testThis env "Has unconfirmed files completed" testHasUnconfirmedFilesCompleted
     ]
 
 testRegisterProcess :: TestEff ()
 testRegisterProcess = do
   owner <- newOwner "test-client-proc-1"
-  withTestPool $ Update.insertOwner owner
+  withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let form = ProcessRegistrationForm ownerId
   void $ assertRight "Register process" =<< runRequest (Client.registerProcess form)
@@ -35,7 +38,7 @@ testRegisterProcess = do
 testCompleteProcessNoFiles :: TestEff ()
 testCompleteProcessNoFiles = do
   owner <- newOwner "test-client-proc-2"
-  withTestPool $ Update.insertOwner owner
+  withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let form = ProcessRegistrationForm ownerId
   result <- assertRight "Register process" =<< runRequest (Client.registerProcess form)
@@ -44,7 +47,7 @@ testCompleteProcessNoFiles = do
 testCompleteProcessNoFilesInvalidTransition :: TestEff ()
 testCompleteProcessNoFilesInvalidTransition = do
   owner <- newOwner "test-client-proc-3"
-  withTestPool $ Update.insertOwner owner
+  withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let form = ProcessRegistrationForm ownerId
   result <- assertRight "Register process" =<< runRequest (Client.registerProcess form)
@@ -54,7 +57,7 @@ testCompleteProcessNoFilesInvalidTransition = do
 testCancelProcessNoFiles :: TestEff ()
 testCancelProcessNoFiles = do
   owner <- newOwner "test-client-proc-4"
-  withTestPool $ Update.insertOwner owner
+  withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let form = ProcessRegistrationForm ownerId
   result <- assertRight "Register process" =<< runRequest (Client.registerProcess form)
@@ -63,7 +66,7 @@ testCancelProcessNoFiles = do
 testCancelProcessNoFilesInvalidTransition :: TestEff ()
 testCancelProcessNoFilesInvalidTransition = do
   owner <- newOwner "test-client-proc-5"
-  withTestPool $ Update.insertOwner owner
+  withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let form = ProcessRegistrationForm ownerId
   result <- assertRight "Register process" =<< runRequest (Client.registerProcess form)
@@ -73,7 +76,7 @@ testCancelProcessNoFilesInvalidTransition = do
 testCompleteProcessWith1File :: TestEff ()
 testCompleteProcessWith1File = do
   owner <- newOwner "test-client-proc-6"
-  withTestPool $ Update.insertOwner owner
+  withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let processForm = ProcessRegistrationForm ownerId
   registerProcessResult <- assertRight "Register process" =<< runRequest (Client.registerProcess processForm)
@@ -88,7 +91,7 @@ testCompleteProcessWith1File = do
 testCompleteProcessWith2Files :: TestEff ()
 testCompleteProcessWith2Files = do
   owner <- newOwner "test-client-proc-7"
-  withTestPool $ Update.insertOwner owner
+  withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let processForm = ProcessRegistrationForm ownerId
   registerProcessResult <- assertRight "Register process" =<< runRequest (Client.registerProcess processForm)
@@ -105,7 +108,7 @@ testCompleteProcessWith2Files = do
 testCancelProcessWith1File :: TestEff ()
 testCancelProcessWith1File = do
   owner <- newOwner "test-client-proc-8"
-  withTestPool $ Update.insertOwner owner
+  withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let processForm = ProcessRegistrationForm ownerId
   registerProcessResult <- assertRight "Register process" =<< runRequest (Client.registerProcess processForm)
@@ -120,7 +123,7 @@ testCancelProcessWith1File = do
 testCancelProcessWith2Files :: TestEff ()
 testCancelProcessWith2Files = do
   owner <- newOwner "test-client-proc-9"
-  withTestPool $ Update.insertOwner owner
+  withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let processForm = ProcessRegistrationForm ownerId
   registerProcessResult <- assertRight "Register process" =<< runRequest (Client.registerProcess processForm)
@@ -133,3 +136,38 @@ testCancelProcessWith2Files = do
   void $ assertRight "Confirm file" =<< runRequest (Client.confirmFile registerFileResult.fileId)
   void $ assertRight "Confirm file " =<< runRequest (Client.confirmFile registerFileResult2.fileId)
   void $ assertRight "Cancel process" =<< runRequest (Client.cancelProcess registerProcessResult.processId)
+
+testHasUnconfirmedFilesPending :: TestEff ()
+testHasUnconfirmedFilesPending = do
+  owner <- newOwner "test-client-proc-10"
+  withTestPool $ OwnerUpdate.insertOwner owner
+  let ownerId = owner.ownerId
+  let processForm = ProcessRegistrationForm ownerId
+  registerProcessResult <- assertRight "Register process" =<< runRequest (Client.registerProcess processForm)
+  let fileName = "toto.txt"
+      mimeType = "text/plain"
+      processId = Just registerProcessResult.processId
+  let fileForm = FileRegistrationForm fileName owner.ownerId mimeType processId
+  registerFileResult <- assertRight "Register file" =<< runRequest (Client.registerFile fileForm)
+  void $ assertRight "Register file" =<< runRequest (Client.registerFile fileForm)
+  void $ assertRight "Confirm file" =<< runRequest (Client.confirmFile registerFileResult.fileId)
+  result <- withTestPool $ ProcessQuery.hasUnconfirmedFiles registerProcessResult.processId
+  assertBool "Should have unconfirmed files" result
+
+testHasUnconfirmedFilesCompleted :: TestEff ()
+testHasUnconfirmedFilesCompleted = do
+  owner <- newOwner "test-client-proc-11"
+  withTestPool $ OwnerUpdate.insertOwner owner
+  let ownerId = owner.ownerId
+  let processForm = ProcessRegistrationForm ownerId
+  registerProcessResult <- assertRight "Register process" =<< runRequest (Client.registerProcess processForm)
+  let fileName = "toto.txt"
+      mimeType = "text/plain"
+      processId = Just registerProcessResult.processId
+  let fileForm = FileRegistrationForm fileName owner.ownerId mimeType processId
+  registerFileResult <- assertRight "Register file" =<< runRequest (Client.registerFile fileForm)
+  registerFileResult2 <- assertRight "Register file" =<< runRequest (Client.registerFile fileForm)
+  void $ assertRight "Confirm file" =<< runRequest (Client.confirmFile registerFileResult.fileId)
+  void $ assertRight "Confirm file" =<< runRequest (Client.confirmFile registerFileResult2.fileId)
+  result <- withTestPool $ ProcessQuery.hasUnconfirmedFiles registerProcessResult.processId
+  assertBool "Should have unconfirmed files" (not result)
