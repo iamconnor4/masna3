@@ -67,6 +67,7 @@ library
     Masna3.Server.Environment
     Masna3.Server.Error
     Masna3.Server.File
+    Masna3.Server.Guards
     Masna3.Server.Jobs.Types
     Masna3.Server.Model.File.Query
     Masna3.Server.Model.File.Types
