@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedLists #-}
-{-# LANGUAGE QuasiQuotes #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Masna3.Server.Model.ProcessFile.Types
