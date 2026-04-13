@@ -10,23 +10,38 @@ import Effectful.Time qualified as Time
 import Masna3.Api.File
 import Masna3.Api.File.FileId
 import Masna3.Api.Owner.OwnerId (OwnerId)
+import Masna3.Api.Process.ProcessId (ProcessId)
 import Servant.API.ContentTypes
 
 import Masna3.Server.AWS.URL
 import Masna3.Server.Database
 import Masna3.Server.Effects
 import Masna3.Server.Environment
-import Masna3.Server.Error (FileNotFound (..), InvalidTransitionError (..), Masna3Error (..), MkInvalidTransitionFile (..), OwnerNotFound (..))
+import Masna3.Server.Error
 import Masna3.Server.Model.File.Query qualified as Query
 import Masna3.Server.Model.File.Types
 import Masna3.Server.Model.File.Update qualified as Update
 import Masna3.Server.Model.Owner.Query (getOwnerById)
 import Masna3.Server.Model.Owner.Types (Owner)
+import Masna3.Server.Model.Process.Query
+import Masna3.Server.Model.Process.Types
+import Masna3.Server.Model.ProcessFile.Types (newProcessFile)
+import Masna3.Server.Model.ProcessFile.Update qualified as ProcessFileUpdate
+
+guardThatProcessExists :: ProcessId -> Eff RouteEffects Process
+guardThatProcessExists processId = do
+  maybeProcess <- withPool (getProcessById processId)
+  case maybeProcess of
+    Nothing ->
+      Log.localData ["process_id" .= processId] $
+        Error.throwError (ProcessNotFoundError (ProcessNotFound processId))
+    Just process -> pure process
 
 registerHandler :: FileRegistrationForm -> Eff RouteEffects FileRegistrationResult
 registerHandler form = do
   Masna3Env{awsBucket} <- Reader.ask
   guardThatOwnerExists form.ownerId
+  void $ traverse guardThatProcessExists form.processId
   file <-
     newFile
       form.ownerId
@@ -40,8 +55,11 @@ registerHandler form = do
         awsBucket
         form.mimeType
         path
-  withPool (Update.insertFile file)
-  pure FileRegistrationResult{fileId = file.fileId, url}
+  processFile <- traverse (`newProcessFile` file.fileId) form.processId
+  withPool $ do
+    Update.insertFile file
+    traverse ProcessFileUpdate.insertProcessFile processFile
+  pure FileRegistrationResult{fileId = file.fileId, url, processId = form.processId}
 
 guardThatOwnerExists :: OwnerId -> Eff RouteEffects Owner
 guardThatOwnerExists ownerId = do
