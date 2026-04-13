@@ -74,6 +74,13 @@ library
     Masna3.Server.Model.Owner.Query
     Masna3.Server.Model.Owner.Types
     Masna3.Server.Model.Owner.Update
+    Masna3.Server.Model.Process.Query
+    Masna3.Server.Model.Process.Types
+    Masna3.Server.Model.Process.Update
+    Masna3.Server.Model.ProcessFile.Query
+    Masna3.Server.Model.ProcessFile.Types
+    Masna3.Server.Model.ProcessFile.Update
+    Masna3.Server.Process
 
   build-depends:
     aeson,
@@ -149,6 +156,7 @@ test-suite masna3-test
   -- cabal-gild: discover test --exclude "test/Main.hs"
   other-modules:
     Masna3.Test.File
+    Masna3.Test.Process
     Masna3.Test.Utils
 
   build-depends:

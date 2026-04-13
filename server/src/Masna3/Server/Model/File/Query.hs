@@ -4,6 +4,7 @@
 module Masna3.Server.Model.File.Query
   ( getFileById
   , listExpiredFiles
+  , queryOne
   ) where
 
 import Data.Set (Set)
