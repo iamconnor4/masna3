@@ -17,12 +17,12 @@ import Masna3.Server.Effects
 import Masna3.Server.Environment
 import Masna3.Server.Error
 import Masna3.Server.File.Guards
-import Masna3.Server.Process.Guards
-import Masna3.Server.Owner.Guards
 import Masna3.Server.Model.File.Types
 import Masna3.Server.Model.File.Update qualified as Update
 import Masna3.Server.Model.ProcessFile.Types (newProcessFile)
 import Masna3.Server.Model.ProcessFile.Update qualified as ProcessFileUpdate
+import Masna3.Server.Owner.Guards
+import Masna3.Server.Process.Guards
 
 registerHandler :: FileRegistrationForm -> Eff RouteEffects FileRegistrationResult
 registerHandler form = do

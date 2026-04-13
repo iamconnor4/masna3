@@ -7,10 +7,10 @@ import Servant.API.ContentTypes
 
 import Masna3.Server.Database
 import Masna3.Server.Effects
-import Masna3.Server.Process.Guards
-import Masna3.Server.Owner.Guards
 import Masna3.Server.Model.Process.Types
 import Masna3.Server.Model.Process.Update qualified as Update
+import Masna3.Server.Owner.Guards
+import Masna3.Server.Process.Guards
 
 registerHandler :: ProcessRegistrationForm -> Eff RouteEffects ProcessRegistrationResult
 registerHandler form = do
