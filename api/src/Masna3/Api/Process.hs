@@ -31,10 +31,10 @@ type RegisterProcess =
     :> ReqBody '[JSON] ProcessRegistrationForm
     :> Post '[JSON] ProcessRegistrationResult
 
-type ConfirmProcess =
-  Summary "Confirm a multi-file upload process"
+type CompleteProcess =
+  Summary "Complete a multi-file upload process"
     :> Capture "process_id" ProcessId
-    :> "confirm"
+    :> "complete"
     :> Post '[JSON] NoContent
 
 type CancelProcess =
@@ -45,7 +45,7 @@ type CancelProcess =
 
 data ProcessRoutes mode = ProcessRoutes
   { register :: mode :- RegisterProcess
-  , confirm :: mode :- ConfirmProcess
+  , complete :: mode :- CompleteProcess
   , cancel :: mode :- CancelProcess
   }
   deriving stock (Generic)

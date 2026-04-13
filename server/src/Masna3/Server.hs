@@ -107,7 +107,7 @@ processServer :: ServerT (NamedRoutes ProcessRoutes) (Eff RouteEffects)
 processServer =
   ProcessRoutes
     { register = Process.registerHandler
-    , confirm = Process.confirmHandler
+    , complete = Process.completeHandler
     , cancel = Process.cancelHandler
     }
 

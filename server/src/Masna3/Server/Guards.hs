@@ -33,7 +33,7 @@ guardThatProcessFilesConfirmed processId = do
   case unconfirmedFiles of
     True ->
       Log.localData ["process_id" .= processId] $
-        Error.throwError (ProcessFilesNotConfirmedError (ProcessFilesNotConfirmed processId))
+        Error.throwError (ProcessFilesNotCompletedError (ProcessFilesNotCompleted processId))
     False -> pure ()
 
 guardThatOwnerExists :: OwnerId -> Eff RouteEffects Owner

@@ -20,8 +20,8 @@ registerHandler form = do
   withPool (Update.insertProcess process)
   pure ProcessRegistrationResult{processId = process.processId}
 
-confirmHandler :: ProcessId -> Eff RouteEffects NoContent
-confirmHandler processId = do
+completeHandler :: ProcessId -> Eff RouteEffects NoContent
+completeHandler processId = do
   void $ guardThatProcessExists processId
   void $ guardThatProcessFilesConfirmed processId
   withPool (Update.deleteProcess processId)

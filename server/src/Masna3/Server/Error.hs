@@ -19,11 +19,11 @@ newtype ProcessNotFound = ProcessNotFound {processId :: ProcessId}
     (FromJSON, ToJSON)
     via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField] ProcessNotFound)
 
-newtype ProcessFilesNotConfirmed = ProcessFilesNotConfirmed {processId :: ProcessId}
+newtype ProcessFilesNotCompleted = ProcessFilesNotCompleted {processId :: ProcessId}
   deriving stock (Eq, Generic, Ord, Show)
   deriving
     (FromJSON, ToJSON)
-    via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField] ProcessFilesNotConfirmed)
+    via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField] ProcessFilesNotCompleted)
 
 newtype FileNotFound = FileNotFound {fileId :: FileId}
   deriving stock (Eq, Generic, Ord, Show)
@@ -41,7 +41,7 @@ data Masna3Error
   = TooManyRows Text
   | OwnerNotFoundError OwnerNotFound
   | ProcessNotFoundError ProcessNotFound
-  | ProcessFilesNotConfirmedError ProcessFilesNotConfirmed
+  | ProcessFilesNotCompletedError ProcessFilesNotCompleted
   | FileNotFoundError FileNotFound
   | InvalidTransition InvalidTransitionError
   deriving stock (Eq, Generic, Ord, Show)
@@ -61,6 +61,6 @@ toServerError = \case
   TooManyRows _ -> err500
   OwnerNotFoundError _ -> err404
   ProcessNotFoundError _ -> err404
-  ProcessFilesNotConfirmedError _ -> err409
+  ProcessFilesNotCompletedError _ -> err409
   FileNotFoundError _ -> err404
   InvalidTransition _ -> err500

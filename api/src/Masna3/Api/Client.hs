@@ -3,7 +3,7 @@ module Masna3.Api.Client
   , confirmFile
   , deleteFile
   , registerProcess
-  , confirmProcess
+  , completeProcess
   , cancelProcess
   ) where
 
@@ -52,12 +52,12 @@ registerProcess form =
     // (.register)
     /: form
 
-confirmProcess :: ProcessId -> ClientM NoContent
-confirmProcess processId =
+completeProcess :: ProcessId -> ClientM NoContent
+completeProcess processId =
   masna3Client
     // (.api)
     // (.processes)
-    // (.cancel)
+    // (.complete)
     /: processId
 
 cancelProcess :: ProcessId -> ClientM NoContent

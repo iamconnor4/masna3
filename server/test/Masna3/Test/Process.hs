@@ -14,12 +14,12 @@ spec env =
   testGroup
     "Process tests"
     [ testThis env "Register process" testRegisterProcess
-    , testThis env "Confirm process" testConfirmProcessNoFiles
-    , testThis env "Confirm process invalid transition" testConfirmProcessNoFilesInvalidTransition
+    , testThis env "Complete process" testCompleteProcessNoFiles
+    , testThis env "Complete process invalid transition" testCompleteProcessNoFilesInvalidTransition
     , testThis env "Cancel process" testCancelProcessNoFiles
     , testThis env "Cancel process invalid transition" testCancelProcessNoFilesInvalidTransition
-    , testThis env "Confirm process with 1 file" testConfirmProcessWith1File
-    , testThis env "Confirm process with 2 files" testConfirmProcessWith2Files
+    , testThis env "Complete process with 1 file" testCompleteProcessWith1File
+    , testThis env "Complete process with 2 files" testCompleteProcessWith2Files
     , testThis env "Cancel process with 1 file" testCancelProcessWith1File
     , testThis env "Cancel process with 2 files" testCancelProcessWith2Files
     ]
@@ -32,24 +32,24 @@ testRegisterProcess = do
   let form = ProcessRegistrationForm ownerId
   void $ assertRight "Register process" =<< runRequest (Client.registerProcess form)
 
-testConfirmProcessNoFiles :: TestEff ()
-testConfirmProcessNoFiles = do
+testCompleteProcessNoFiles :: TestEff ()
+testCompleteProcessNoFiles = do
   owner <- newOwner "test-client-proc-2"
   withTestPool $ Update.insertOwner owner
   let ownerId = owner.ownerId
   let form = ProcessRegistrationForm ownerId
   result <- assertRight "Register process" =<< runRequest (Client.registerProcess form)
-  void $ assertRight "Confirm process" =<< runRequest (Client.confirmProcess result.processId)
+  void $ assertRight "Complete process" =<< runRequest (Client.completeProcess result.processId)
 
-testConfirmProcessNoFilesInvalidTransition :: TestEff ()
-testConfirmProcessNoFilesInvalidTransition = do
+testCompleteProcessNoFilesInvalidTransition :: TestEff ()
+testCompleteProcessNoFilesInvalidTransition = do
   owner <- newOwner "test-client-proc-3"
   withTestPool $ Update.insertOwner owner
   let ownerId = owner.ownerId
   let form = ProcessRegistrationForm ownerId
   result <- assertRight "Register process" =<< runRequest (Client.registerProcess form)
-  void $ assertRight "Confirm process" =<< runRequest (Client.confirmProcess result.processId)
-  void $ assertLeftWithStatus "Confirm process" 404 =<< runRequest (Client.confirmProcess result.processId)
+  void $ assertRight "Complete process" =<< runRequest (Client.completeProcess result.processId)
+  void $ assertLeftWithStatus "Complete process" 404 =<< runRequest (Client.completeProcess result.processId)
 
 testCancelProcessNoFiles :: TestEff ()
 testCancelProcessNoFiles = do
@@ -70,8 +70,8 @@ testCancelProcessNoFilesInvalidTransition = do
   void $ assertRight "Cancel process" =<< runRequest (Client.cancelProcess result.processId)
   void $ assertLeftWithStatus "Cancel process" 404 =<< runRequest (Client.cancelProcess result.processId)
 
-testConfirmProcessWith1File :: TestEff ()
-testConfirmProcessWith1File = do
+testCompleteProcessWith1File :: TestEff ()
+testCompleteProcessWith1File = do
   owner <- newOwner "test-client-proc-6"
   withTestPool $ Update.insertOwner owner
   let ownerId = owner.ownerId
@@ -83,10 +83,10 @@ testConfirmProcessWith1File = do
   let fileForm = FileRegistrationForm fileName owner.ownerId mimeType processId
   registerFileResult <- assertRight "Register file" =<< runRequest (Client.registerFile fileForm)
   void $ assertRight "Confirm file" =<< runRequest (Client.confirmFile registerFileResult.fileId)
-  void $ assertRight "Confirm process" =<< runRequest (Client.confirmProcess registerProcessResult.processId)
+  void $ assertRight "Complete process" =<< runRequest (Client.completeProcess registerProcessResult.processId)
 
-testConfirmProcessWith2Files :: TestEff ()
-testConfirmProcessWith2Files = do
+testCompleteProcessWith2Files :: TestEff ()
+testCompleteProcessWith2Files = do
   owner <- newOwner "test-client-proc-7"
   withTestPool $ Update.insertOwner owner
   let ownerId = owner.ownerId
@@ -100,7 +100,7 @@ testConfirmProcessWith2Files = do
   registerFileResult2 <- assertRight "Register file" =<< runRequest (Client.registerFile fileForm)
   void $ assertRight "Confirm file" =<< runRequest (Client.confirmFile registerFileResult.fileId)
   void $ assertRight "Confirm file " =<< runRequest (Client.confirmFile registerFileResult2.fileId)
-  void $ assertRight "Confirm process" =<< runRequest (Client.confirmProcess registerProcessResult.processId)
+  void $ assertRight "Complete process" =<< runRequest (Client.completeProcess registerProcessResult.processId)
 
 testCancelProcessWith1File :: TestEff ()
 testCancelProcessWith1File = do
