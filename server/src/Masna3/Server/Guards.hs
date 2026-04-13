@@ -27,6 +27,15 @@ guardThatProcessExists processId = do
         Error.throwError (ProcessNotFoundError (ProcessNotFound processId))
     Just process -> pure process
 
+guardThatProcessFilesConfirmed :: ProcessId -> Eff RouteEffects ()
+guardThatProcessFilesConfirmed processId = do
+  unconfirmedFiles <- withPool (hasUnconfirmedFiles processId)
+  case unconfirmedFiles of
+    True ->
+      Log.localData ["process_id" .= processId] $
+        Error.throwError (ProcessFilesNotConfirmedError (ProcessFilesNotConfirmed processId))
+    False -> pure ()
+
 guardThatOwnerExists :: OwnerId -> Eff RouteEffects Owner
 guardThatOwnerExists ownerId = do
   maybeOwner <- withPool (getOwnerById ownerId)

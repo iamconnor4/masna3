@@ -23,6 +23,7 @@ registerHandler form = do
 confirmHandler :: ProcessId -> Eff RouteEffects NoContent
 confirmHandler processId = do
   void $ guardThatProcessExists processId
+  void $ guardThatProcessFilesConfirmed processId
   withPool (Update.deleteProcess processId)
   pure NoContent
 
