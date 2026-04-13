@@ -2,6 +2,9 @@ module Masna3.Api.Client
   ( registerFile
   , confirmFile
   , deleteFile
+  , registerProcess
+  , confirmProcess
+  , cancelProcess
   ) where
 
 import Data.Proxy
@@ -11,6 +14,8 @@ import Servant.Client
 import Masna3.Api
 import Masna3.Api.File
 import Masna3.Api.File.FileId
+import Masna3.Api.Process
+import Masna3.Api.Process.ProcessId
 
 masna3Client :: ServerRoutes (AsClientT ClientM)
 masna3Client = client (Proxy @(NamedRoutes ServerRoutes))
@@ -38,3 +43,27 @@ deleteFile fileId =
     // (.files)
     // (.delete)
     /: fileId
+
+registerProcess :: ProcessRegistrationForm -> ClientM ProcessRegistrationResult
+registerProcess form =
+  masna3Client
+    // (.api)
+    // (.processes)
+    // (.register)
+    /: form
+
+confirmProcess :: ProcessId -> ClientM NoContent
+confirmProcess processId =
+  masna3Client
+    // (.api)
+    // (.processes)
+    // (.cancel)
+    /: processId
+
+cancelProcess :: ProcessId -> ClientM NoContent
+cancelProcess processId =
+  masna3Client
+    // (.api)
+    // (.processes)
+    // (.cancel)
+    /: processId

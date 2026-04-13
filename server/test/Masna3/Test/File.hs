@@ -33,7 +33,8 @@ testRegisterFile = do
   withTestPool $ Update.insertOwner owner
   let fileName = "toto.txt"
       mimeType = "text/plain"
-  let form = FileRegistrationForm fileName owner.ownerId mimeType
+      processId = Nothing
+  let form = FileRegistrationForm fileName owner.ownerId mimeType processId
   void $ assertRight "Register file" =<< runRequest (Client.registerFile form)
 
 testConfirmFile :: TestEff ()
@@ -42,7 +43,8 @@ testConfirmFile = do
   withTestPool $ Update.insertOwner owner
   let fileName = "toto.txt"
       mimeType = "text/plain"
-  let form = FileRegistrationForm fileName owner.ownerId mimeType
+      processId = Nothing
+  let form = FileRegistrationForm fileName owner.ownerId mimeType processId
   result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
   void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
 
@@ -52,7 +54,8 @@ testConfirmFileInvalidTransition = do
   withTestPool $ Update.insertOwner owner
   let fileName = "toto.txt"
       mimeType = "text/plain"
-  let form = FileRegistrationForm fileName owner.ownerId mimeType
+      processId = Nothing
+  let form = FileRegistrationForm fileName owner.ownerId mimeType processId
   result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
   void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
   void $ assertLeftWithStatus "Confirm File" 500 =<< runRequest (Client.confirmFile result.fileId)
@@ -63,7 +66,8 @@ testDeleteFile = do
   withTestPool $ Update.insertOwner owner
   let fileName = "toto.txt"
       mimeType = "text/plain"
-  let form = FileRegistrationForm fileName owner.ownerId mimeType
+      processId = Nothing
+  let form = FileRegistrationForm fileName owner.ownerId mimeType processId
   result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
   void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
   void $ assertRight "Delete File" =<< runRequest (Client.deleteFile result.fileId)
@@ -74,7 +78,8 @@ testDeleteFileInvalidTransition = do
   withTestPool $ Update.insertOwner owner
   let fileName = "toto.txt"
       mimeType = "text/plain"
-  let form = FileRegistrationForm fileName owner.ownerId mimeType
+      processId = Nothing
+  let form = FileRegistrationForm fileName owner.ownerId mimeType processId
   result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
   void $ assertRight "Confirm File" =<< runRequest (Client.confirmFile result.fileId)
   void $ assertRight "Delete File" =<< runRequest (Client.deleteFile result.fileId)
@@ -86,7 +91,8 @@ testUnconfirmedFileGetsTrashed = do
   withTestPool $ Update.insertOwner owner
   let fileName = "file-to-delete.txt"
       mimeType = "text/plain"
-  let form = FileRegistrationForm fileName owner.ownerId mimeType
+      processId = Nothing
+  let form = FileRegistrationForm fileName owner.ownerId mimeType processId
   result <- assertRight "Register file" =<< runRequest (Client.registerFile form)
 
   withTestPool $ do
