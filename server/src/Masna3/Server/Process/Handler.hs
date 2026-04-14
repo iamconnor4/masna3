@@ -23,8 +23,8 @@ registerHandler form = do
 
 completeHandler :: ProcessId -> Eff RouteEffects NoContent
 completeHandler processId = do
-  void $ guardThatProcessCompletable processId
-  void $ guardThatProcessFilesConfirmed processId
+  guardThatProcessCompletable processId
+  guardThatProcessFilesConfirmed processId
   withPool (Update.updateProcessStatus processId Completed)
   pure NoContent
 
