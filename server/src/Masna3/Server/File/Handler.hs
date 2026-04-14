@@ -28,7 +28,7 @@ registerHandler :: FileRegistrationForm -> Eff RouteEffects FileRegistrationResu
 registerHandler form = do
   Masna3Env{awsBucket} <- Reader.ask
   void $ guardThatOwnerExists form.ownerId
-  void $ traverse guardThatProcessCompleted form.processId
+  traverse_ guardThatProcessCompleted form.processId
   file <-
     newFile
       form.ownerId
