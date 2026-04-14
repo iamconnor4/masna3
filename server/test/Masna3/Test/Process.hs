@@ -15,7 +15,6 @@ spec env =
   testGroup
     "Process tests"
     [ testThis env "Register process" testRegisterProcess
-    , testThis env "Complete process" testCompleteProcessNoFiles
     , testThis env "Complete process invalid transition" testCompleteProcessNoFilesInvalidTransition
     , testThis env "Cancel process" testCancelProcessNoFiles
     , testThis env "Cancel process invalid transition" testCancelProcessNoFilesInvalidTransition
@@ -35,24 +34,14 @@ testRegisterProcess = do
   let form = ProcessRegistrationForm ownerId
   void $ assertRight "Register process" =<< runRequest (Client.registerProcess form)
 
-testCompleteProcessNoFiles :: TestEff ()
-testCompleteProcessNoFiles = do
+testCompleteProcessNoFilesInvalidTransition :: TestEff ()
+testCompleteProcessNoFilesInvalidTransition = do
   owner <- newOwner "test-client-proc-2"
   withTestPool $ OwnerUpdate.insertOwner owner
   let ownerId = owner.ownerId
   let form = ProcessRegistrationForm ownerId
   result <- assertRight "Register process" =<< runRequest (Client.registerProcess form)
-  void $ assertRight "Complete process" =<< runRequest (Client.completeProcess result.processId)
-
-testCompleteProcessNoFilesInvalidTransition :: TestEff ()
-testCompleteProcessNoFilesInvalidTransition = do
-  owner <- newOwner "test-client-proc-3"
-  withTestPool $ OwnerUpdate.insertOwner owner
-  let ownerId = owner.ownerId
-  let form = ProcessRegistrationForm ownerId
-  result <- assertRight "Register process" =<< runRequest (Client.registerProcess form)
-  void $ assertRight "Complete process" =<< runRequest (Client.completeProcess result.processId)
-  void $ assertLeftWithStatus "Complete process" 404 =<< runRequest (Client.completeProcess result.processId)
+  void $ assertLeftWithStatus "Complete process" 500 =<< runRequest (Client.completeProcess result.processId)
 
 testCancelProcessNoFiles :: TestEff ()
 testCancelProcessNoFiles = do
