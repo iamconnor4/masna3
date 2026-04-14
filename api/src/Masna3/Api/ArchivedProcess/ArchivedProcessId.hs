@@ -1,4 +1,4 @@
-module Masna3.Api.ProcessFile.ProcessFileId where
+module Masna3.Api.ArchivedProcess.ArchivedProcessId where
 
 import Control.Monad.IO.Class
 import Data.Aeson
@@ -10,7 +10,7 @@ import GHC.Generics
 import Heptapod qualified
 import Servant.API
 
-newtype ProcessFileId = ProcessFileId UUID
+newtype ArchivedProcessId = ArchivedProcessId UUID
   deriving stock (Generic)
   deriving
     (Display)
@@ -19,5 +19,5 @@ newtype ProcessFileId = ProcessFileId UUID
     (Eq, FromField, FromHttpApiData, FromJSON, Ord, Show, ToField, ToHttpApiData, ToJSON)
     via UUID
 
-newProcessFileId :: MonadIO m => m ProcessFileId
-newProcessFileId = ProcessFileId <$> Heptapod.generate
+newArchivedProcessId :: MonadIO m => m ArchivedProcessId
+newArchivedProcessId = ArchivedProcessId <$> Heptapod.generate

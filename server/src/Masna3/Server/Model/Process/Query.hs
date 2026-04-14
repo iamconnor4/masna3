@@ -29,9 +29,8 @@ hasUnconfirmedFiles processId = do
       [sql|
           SELECT EXISTS (
             SELECT *
-            FROM process_files pf
-            JOIN files f ON f.file_id = pf.file_id
-            WHERE pf.process_id = ?
-              AND f.status = 'pending'
+            FROM files
+            WHERE process_id = ?
+              AND status = 'pending'
           )
         |]

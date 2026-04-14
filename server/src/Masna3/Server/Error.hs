@@ -19,11 +19,17 @@ newtype ProcessNotFound = ProcessNotFound {processId :: ProcessId}
     (FromJSON, ToJSON)
     via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField] ProcessNotFound)
 
-newtype ProcessFilesNotCompleted = ProcessFilesNotCompleted {processId :: ProcessId}
+newtype ProcessFilesNotConfirmed = ProcessFilesNotConfirmed {processId :: ProcessId}
   deriving stock (Eq, Generic, Ord, Show)
   deriving
     (FromJSON, ToJSON)
-    via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField] ProcessFilesNotCompleted)
+    via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField] ProcessFilesNotConfirmed)
+
+newtype ProcessAlreadyCompleted = ProcessAlreadyCompleted {processId :: ProcessId}
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving
+    (FromJSON, ToJSON)
+    via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField] ProcessAlreadyCompleted)
 
 newtype FileNotFound = FileNotFound {fileId :: FileId}
   deriving stock (Eq, Generic, Ord, Show)
@@ -37,11 +43,18 @@ newtype MkInvalidTransitionFile = MkInvalidTransitionFile {fileId :: FileId}
     (FromJSON, ToJSON)
     via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField] MkInvalidTransitionFile)
 
+newtype MkInvalidTransitionProcess = MkInvalidTransitionProcess {processId :: ProcessId}
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving
+    (FromJSON, ToJSON)
+    via (CustomJSON '[FieldLabelModifier '[CamelToSnake], SumObjectWithSingleField] MkInvalidTransitionProcess)
+
 data Masna3Error
   = TooManyRows Text
   | OwnerNotFoundError OwnerNotFound
   | ProcessNotFoundError ProcessNotFound
-  | ProcessFilesNotCompletedError ProcessFilesNotCompleted
+  | ProcessFilesNotConfirmedError ProcessFilesNotConfirmed
+  | ProcessAlreadyCompletedError ProcessAlreadyCompleted
   | FileNotFoundError FileNotFound
   | InvalidTransition InvalidTransitionError
   deriving stock (Eq, Generic, Ord, Show)
@@ -51,6 +64,8 @@ data Masna3Error
 
 data InvalidTransitionError
   = NotPendingToUploaded MkInvalidTransitionFile
+  | NotStartedToCompleted MkInvalidTransitionProcess
+  | NotCompletedToCompleted MkInvalidTransitionProcess
   deriving stock (Eq, Generic, Ord, Show)
   deriving
     (FromJSON, ToJSON)
@@ -61,6 +76,7 @@ toServerError = \case
   TooManyRows _ -> err500
   OwnerNotFoundError _ -> err404
   ProcessNotFoundError _ -> err404
-  ProcessFilesNotCompletedError _ -> err409
+  ProcessFilesNotConfirmedError _ -> err409
+  ProcessAlreadyCompletedError _ -> err409
   FileNotFoundError _ -> err404
   InvalidTransition _ -> err500

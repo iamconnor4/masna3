@@ -27,5 +27,26 @@ guardThatProcessFilesConfirmed processId = do
   case unconfirmedFiles of
     True ->
       Log.localData ["process_id" .= processId] $
-        Error.throwError (ProcessFilesNotCompletedError (ProcessFilesNotCompleted processId))
+        Error.throwError (ProcessFilesNotConfirmedError (ProcessFilesNotConfirmed processId))
     False -> pure ()
+
+guardThatProcessCompletable :: ProcessId -> Eff RouteEffects ()
+guardThatProcessCompletable processId = do
+  process <- guardThatProcessExists processId
+  case process.status of
+    Started ->
+      Log.localData ["process_id" .= processId] $
+        Error.throwError (InvalidTransition (NotStartedToCompleted (MkInvalidTransitionProcess processId)))
+    Completed ->
+      Log.localData ["file_id" .= processId] $
+        Error.throwError (InvalidTransition (NotCompletedToCompleted (MkInvalidTransitionProcess processId)))
+    InProgress -> pure ()
+
+guardThatProcessCompleted :: ProcessId -> Eff RouteEffects ()
+guardThatProcessCompleted processId = do
+  process <- guardThatProcessExists processId
+  case process of
+    Process{status = Completed} ->
+      Log.localData ["process_id" .= process.processId] $
+        Error.throwError (ProcessAlreadyCompletedError (ProcessAlreadyCompleted (process.processId)))
+    _ -> pure ()

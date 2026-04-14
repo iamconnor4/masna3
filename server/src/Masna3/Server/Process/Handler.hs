@@ -23,13 +23,13 @@ registerHandler form = do
 
 completeHandler :: ProcessId -> Eff RouteEffects NoContent
 completeHandler processId = do
-  void $ guardThatProcessExists processId
+  void $ guardThatProcessCompletable processId
   void $ guardThatProcessFilesConfirmed processId
-  withPool (Update.deleteProcess processId)
+  withPool (Update.updateProcessStatus processId Completed)
   pure NoContent
 
 cancelHandler :: ProcessId -> Eff RouteEffects NoContent
 cancelHandler processId = do
   void $ guardThatProcessExists processId
-  withPool (Update.deleteProcessAndFiles processId)
+  withPool (Update.cancelProcess processId)
   pure NoContent

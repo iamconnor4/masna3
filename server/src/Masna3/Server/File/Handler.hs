@@ -19,19 +19,20 @@ import Masna3.Server.Error
 import Masna3.Server.File.Guards
 import Masna3.Server.Model.File.Types
 import Masna3.Server.Model.File.Update qualified as Update
-import Masna3.Server.Model.ProcessFile.Types (newProcessFile)
-import Masna3.Server.Model.ProcessFile.Update qualified as ProcessFileUpdate
+import Masna3.Server.Model.Process.Types as ProcessTypes
+import Masna3.Server.Model.Process.Update qualified as ProcessUpdate
 import Masna3.Server.Owner.Guards
 import Masna3.Server.Process.Guards
 
 registerHandler :: FileRegistrationForm -> Eff RouteEffects FileRegistrationResult
 registerHandler form = do
   Masna3Env{awsBucket} <- Reader.ask
-  guardThatOwnerExists form.ownerId
-  void $ traverse guardThatProcessExists form.processId
+  void $ guardThatOwnerExists form.ownerId
+  void $ traverse guardThatProcessCompleted form.processId
   file <-
     newFile
       form.ownerId
+      form.processId
       form.fileName
       awsBucket
       form.mimeType
@@ -42,10 +43,9 @@ registerHandler form = do
         awsBucket
         form.mimeType
         path
-  processFile <- traverse (`newProcessFile` file.fileId) form.processId
   withPool $ do
     Update.insertFile file
-    traverse ProcessFileUpdate.insertProcessFile processFile
+    traverse_ (`ProcessUpdate.updateProcessStatus` ProcessTypes.InProgress) form.processId
   pure FileRegistrationResult{fileId = file.fileId, url, processId = form.processId}
 
 confirmHandler :: FileId -> Eff RouteEffects NoContent

@@ -53,13 +53,13 @@ library
   exposed-modules:
     Masna3.Api
     Masna3.Api.ArchivedFile.ArchivedFileId
+    Masna3.Api.ArchivedProcess.ArchivedProcessId
     Masna3.Api.Client
     Masna3.Api.File
     Masna3.Api.File.FileId
     Masna3.Api.Owner.OwnerId
     Masna3.Api.Process
     Masna3.Api.Process.ProcessId
-    Masna3.Api.ProcessFile.ProcessFileId
 
   build-depends:
     aeson,
