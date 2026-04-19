@@ -3,6 +3,7 @@
 
 module Masna3.Server.Model.Process.Query
   ( getProcessById
+  , getLiveProcessById
   , hasUnconfirmedFiles
   ) where
 
@@ -19,6 +20,16 @@ import Masna3.Server.Model.Process.Types
 
 getProcessById :: (IOE :> es, WithConnection :> es) => ProcessId -> Eff es (Maybe Process)
 getProcessById processId = queryOne (_selectWhere @Process [[field| process_id |]]) (Only processId)
+
+getLiveProcessById :: (IOE :> es, WithConnection :> es) => ProcessId -> Eff es (Maybe Process)
+getLiveProcessById processId =
+  queryOne
+    [sql|
+  SELECT * FROM processes
+  WHERE process_id = ?
+  AND status IN ('started', 'in_progress')
+  |]
+    (Only processId)
 
 hasUnconfirmedFiles :: (IOE :> es, WithConnection :> es) => ProcessId -> Eff es Bool
 hasUnconfirmedFiles processId = do

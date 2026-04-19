@@ -21,6 +21,15 @@ guardThatProcessExists processId = do
         Error.throwError (ProcessNotFoundError (ProcessNotFound processId))
     Just process -> pure process
 
+guardThatLiveProcessExists :: ProcessId -> Eff RouteEffects Process
+guardThatLiveProcessExists processId = do
+  maybeProcess <- withPool (getLiveProcessById processId)
+  case maybeProcess of
+    Nothing ->
+      Log.localData ["process_id" .= processId] $
+        Error.throwError (ProcessNotFoundError (ProcessNotFound processId))
+    Just process -> pure process
+
 guardThatProcessFilesConfirmed :: ProcessId -> Eff RouteEffects ()
 guardThatProcessFilesConfirmed processId = do
   unconfirmedFiles <- withPool (hasUnconfirmedFiles processId)

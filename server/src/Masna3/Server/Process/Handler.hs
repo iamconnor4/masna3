@@ -30,6 +30,6 @@ completeHandler processId = do
 
 cancelHandler :: ProcessId -> Eff RouteEffects NoContent
 cancelHandler processId = do
-  void $ guardThatProcessExists processId
+  void $ guardThatLiveProcessExists processId
   withPool (Update.cancelProcess processId)
   pure NoContent

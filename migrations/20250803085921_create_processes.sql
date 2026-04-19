@@ -7,3 +7,5 @@ CREATE TABLE processes (
   , created_at timestamptz NOT NULL
   , updated_at timestamptz
 );
+
+CREATE INDEX ON processes (status) WHERE status IN ('started' 'in_progress');

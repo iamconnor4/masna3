@@ -44,6 +44,7 @@ cancelProcess processId = do
         deleted_process AS (
           DELETE FROM processes
           WHERE process_id = ?
+          AND status IN ('started', 'in_progress')
           RETURNING *
         )
         INSERT INTO archived_processes
