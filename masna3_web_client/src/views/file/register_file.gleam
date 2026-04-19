@@ -1,6 +1,6 @@
 import components/rsvp_error
 import components/validation_error
-import domain/register_file.{
+import domain/file/register_file.{
   FileRegistrationResult, UserChangedFileName, UserChangedMimeType,
   UserChangedOwnerId, UserChangedProcessId, UserSubmittedForm,
 }

@@ -2,7 +2,7 @@ import gleam/list
 
 import gleeunit/should
 
-import domain/register_file.{
+import domain/file/register_file.{
   UserChangedMimeType, UserChangedOwnerId, UserSubmittedForm, init, update,
 }
 

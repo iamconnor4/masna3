@@ -5,9 +5,9 @@ import lustre/element.{type Element}
 import lustre/element/html
 import modem
 
-import domain/confirm_file
-import domain/delete_file
-import domain/register_file
+import domain/file/confirm_file
+import domain/file/delete_file
+import domain/file/register_file
 import types/model.{type Model, Model}
 import types/msg.{type Msg, UserNavigatedTo}
 import types/route.{type Route}

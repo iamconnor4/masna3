@@ -1,8 +1,8 @@
 import lustre/effect.{type Effect}
 
-import domain/confirm_file
-import domain/delete_file
-import domain/register_file
+import domain/file/confirm_file
+import domain/file/delete_file
+import domain/file/register_file
 import types/model.{type Model, Model}
 import types/msg.{
   type Msg, ConfirmFileMsg, DeleteFileMsg, RegisterFileMsg, UserNavigatedTo,
