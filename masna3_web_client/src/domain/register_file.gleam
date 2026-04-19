@@ -12,6 +12,7 @@ pub type Msg {
   UserChangedFileName(String)
   UserChangedMimeType(String)
   UserChangedOwnerId(String)
+  UserChangedProcessId(String)
   UserSubmittedForm
   ApiReturnedRegisteredFile(Result(FileRegistrationResult, rsvp.Error))
 }
@@ -25,18 +26,37 @@ pub type Model {
 }
 
 pub type FileRegistrationForm {
-  FileRegistrationForm(file_name: String, mime_type: String, owner_id: String)
+  FileRegistrationForm(
+    file_name: String,
+    mime_type: String,
+    owner_id: String,
+    process_id: Option(String),
+  )
 }
 
 pub type FileRegistrationResult {
-  FileRegistrationResult(file_id: String, url: String)
+  FileRegistrationResult(
+    file_id: String,
+    url: String,
+    process_id: Option(String),
+  )
 }
 
 pub fn send(form: FileRegistrationForm) -> Effect(Msg) {
   let decoder = {
     use file_id <- decode.field("file_id", decode.string)
     use url <- decode.field("url", decode.string)
-    decode.success(FileRegistrationResult(file_id:, url:))
+    use process_id <- decode.optional_field(
+      "process_id",
+      None,
+      decode.map(decode.string, Some),
+    )
+    decode.success(FileRegistrationResult(file_id:, url:, process_id:))
+  }
+
+  let process_id = case form.process_id {
+    None -> []
+    Some(id) -> [#("process_id", json.string(id))]
   }
 
   let body =
@@ -44,6 +64,7 @@ pub fn send(form: FileRegistrationForm) -> Effect(Msg) {
       #("file_name", json.string(form.file_name)),
       #("mime_type", json.string(form.mime_type)),
       #("owner_id", json.string(form.owner_id)),
+      ..process_id
     ])
 
   let url = config.api_base_url <> "/files/register"
@@ -54,7 +75,12 @@ pub fn send(form: FileRegistrationForm) -> Effect(Msg) {
 
 pub fn init() -> Model {
   let register_file_form =
-    FileRegistrationForm(file_name: "", mime_type: "", owner_id: "")
+    FileRegistrationForm(
+      file_name: "",
+      mime_type: "",
+      owner_id: "",
+      process_id: None,
+    )
 
   Model(
     register_file_form:,
@@ -77,6 +103,16 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     }
     UserChangedOwnerId(v) -> {
       let form = FileRegistrationForm(..model.register_file_form, owner_id: v)
+
+      #(Model(..model, register_file_form: form), effect.none())
+    }
+    UserChangedProcessId(v) -> {
+      let process_id = case v {
+        "" -> None
+        _ -> Some(v)
+      }
+
+      let form = FileRegistrationForm(..model.register_file_form, process_id:)
 
       #(Model(..model, register_file_form: form), effect.none())
     }
@@ -104,6 +140,7 @@ fn validate(form: FileRegistrationForm) -> List(ValidationError) {
   [
     validation.validate_uuid(form.owner_id),
     validation.validate_mime_type(form.mime_type),
+    option.map(form.process_id, validation.validate_uuid) |> option.flatten,
   ]
   |> option.values()
 }
