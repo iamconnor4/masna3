@@ -6,6 +6,7 @@ import lustre/effect.{type Effect}
 import rsvp
 
 import config
+import types/domain.{type OwnerId, type ProcessId, OwnerId, ProcessId}
 import validation.{type ValidationError}
 
 pub type Msg {
@@ -25,22 +26,24 @@ pub type Model {
 }
 
 pub type ProcessRegistrationForm {
-  ProcessRegistrationForm(owner_id: String)
+  ProcessRegistrationForm(owner_id: OwnerId)
 }
 
 pub type ProcessRegistrationResult {
-  ProcessRegistrationResult(process_id: String)
+  ProcessRegistrationResult(process_id: ProcessId)
 }
 
 pub fn send(form: ProcessRegistrationForm) -> Effect(Msg) {
   let decoder = {
     use process_id <- decode.field("process_id", decode.string)
-    decode.success(ProcessRegistrationResult(process_id:))
+    decode.success(ProcessRegistrationResult(process_id: ProcessId(process_id)))
   }
+
+  let OwnerId(owner_id_string) = form.owner_id
 
   let body =
     json.object([
-      #("owner_id", json.string(form.owner_id)),
+      #("owner_id", json.string(owner_id_string)),
     ])
 
   let url = config.api_base_url <> "/processes/register"
@@ -50,7 +53,7 @@ pub fn send(form: ProcessRegistrationForm) -> Effect(Msg) {
 }
 
 pub fn init() -> Model {
-  let register_process_form = ProcessRegistrationForm(owner_id: "")
+  let register_process_form = ProcessRegistrationForm(owner_id: OwnerId(""))
 
   Model(
     register_process_form:,
@@ -62,7 +65,7 @@ pub fn init() -> Model {
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
     UserChangedOwnerId(v) -> {
-      let form = ProcessRegistrationForm(owner_id: v)
+      let form = ProcessRegistrationForm(owner_id: OwnerId(v))
 
       #(Model(..model, register_process_form: form), effect.none())
     }
@@ -87,8 +90,10 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 }
 
 fn validate(form: ProcessRegistrationForm) -> List(ValidationError) {
+  let OwnerId(owner_id_string) = form.owner_id
+
   [
-    validation.validate_uuid(form.owner_id),
+    validation.validate_uuid(owner_id_string),
   ]
   |> option.values()
 }

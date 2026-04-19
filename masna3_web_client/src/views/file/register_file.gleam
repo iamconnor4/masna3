@@ -10,6 +10,7 @@ import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
+import types/domain.{FileId, ProcessId}
 import types/model.{type Model}
 import types/msg.{type Msg, RegisterFileMsg}
 
@@ -22,7 +23,7 @@ pub fn view(model: Model) -> List(Element(Msg)) {
         False -> validation_error.view(model.register_file.validation_errors)
       },
       case model.register_file.register_file_response {
-        Some(Ok(FileRegistrationResult(file_id, url, process_id))) ->
+        Some(Ok(FileRegistrationResult(FileId(file_id), url, process_id))) ->
           html.div(
             [
               attribute.class(
@@ -37,7 +38,8 @@ pub fn view(model: Model) -> List(Element(Msg)) {
               html.p([], [html.text("URL: " <> url)]),
               case process_id {
                 None -> element.none()
-                Some(pid) -> html.p([], [html.text("Process ID: " <> pid)])
+                Some(ProcessId(pid)) ->
+                  html.p([], [html.text("Process ID: " <> pid)])
               },
             ],
           )

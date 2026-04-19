@@ -9,6 +9,7 @@ import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
+import types/domain.{ProcessId}
 import types/model.{type Model}
 import types/msg.{type Msg, RegisterProcessMsg}
 
@@ -21,7 +22,7 @@ pub fn view(model: Model) -> List(Element(Msg)) {
         False -> validation_error.view(model.register_process.validation_errors)
       },
       case model.register_process.register_process_response {
-        Some(Ok(ProcessRegistrationResult(process_id))) ->
+        Some(Ok(ProcessRegistrationResult(ProcessId(process_id)))) ->
           html.div(
             [
               attribute.class(

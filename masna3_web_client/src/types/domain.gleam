@@ -5,3 +5,7 @@ pub type FileId {
 pub type ProcessId {
   ProcessId(String)
 }
+
+pub type OwnerId {
+  OwnerId(String)
+}
