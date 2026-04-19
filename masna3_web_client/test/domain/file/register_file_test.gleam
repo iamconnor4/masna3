@@ -17,7 +17,7 @@ pub fn empty_submit_test() {
   |> should.equal(2)
 }
 
-pub fn missing_uuid_submit_test() {
+pub fn missing_owner_uuid_submit_test() {
   let model = init()
   let #(new_model, _) = update(model, UserChangedMimeType("text/plain"))
   let #(new_model, _) = update(new_model, UserSubmittedForm)
